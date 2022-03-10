@@ -1,12 +1,15 @@
 const bcrypt = require('bcrypt');
+const  jwt  = require('jsonwebtoken');
 const auth = require('../middlewares/auth');
 const models = require('../models');
 
-
+// Regex de validation
+ const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+// const passwordRegex = /^((?=.*[a-z])+(?=.*[A-Z])+(?=.*[0-9])+(?=.*[!@#\$%\^&\*])).{8,20}$/;
 
 exports.signup = (req, res, next) => {
     email = req.body.email
-    username = req.body.email
+    username = req.body.username
     lastname = req.body.lastname
     firstname = req.body.firstname
     password = req.body.email
@@ -14,6 +17,16 @@ exports.signup = (req, res, next) => {
     if(email == "" || username == "" || lastname == "" || firstname == "" || password == "") {
         return res.status(400).json({ "error" : "Tous les champs doivent être remplis !"})
     } 
+     
+    // Regex Validation EMAIL/USERNAME/PASSWORD
+    if(!emailRegex.test(email)) {
+        return res.status(400).json({"error": "l'email n'est pas valide"})
+    }
+
+    // if(!passwordRegex.test(password)){
+    //     return res.status(400).json({"error": "Le mot de passe doit contenir au moins un caractère spécial, une lettre majuscule, une lettre minuscule, et un chiffre - et doit être compris entre 7-20 caractères"})
+    // }
+
 
     models.User.findOne({
         attributes: ['email'],
@@ -34,9 +47,9 @@ exports.signup = (req, res, next) => {
                     })
                     .then(function(newUser){
                         return res.status(201).json({
-                            'userId': newUser.id,
-                            'password': bcryptedPassword,
-                            'token': "RANDOM_TOKEN_SECRET"
+                            userId : newUser.id,
+                            password : bcryptedPassword,
+                            token : "RANDOM_TOKEN_SECRET"
                         })
                     })
                     .catch(function(error){
@@ -88,4 +101,34 @@ exports.login = (req, res) => {
          }
     })
     .catch(err => res.status(500).json({"error": "impossible de vérifier l'utilisateur"}))
+},
+
+exports.profile = (req, res) => {
+    headerAuth = req.headers['authorization'].split(' ')[1];
+    userId = auth.verifyToken(headerAuth)
+    console.log({"verify": userId});
+
+    if(userId < 0){
+        return res.status(400).json({"error" : "wrong token"})
+    }
+
+    models.User.findOne({
+    attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio'],
+    where: { id : userId }
+     })
+    .then(function(user){
+        if(user){
+            return res.status(201).json({user : user})
+        } else {
+            res.status(404).json({ "error" : "Utilisateur non autorisé"});
+        }
+     })
+     .catch(function(error){
+         return res.status(500).json({"error" : "impossible de récupérer l'utilisateur"})
+     })
+},
+
+exports.updateProfile = (req, res) => {
+    headerAuth = req.headers['authorization'].split(' ')[1];
+    userId = auth.verifyToken(headerAuth)
 }
