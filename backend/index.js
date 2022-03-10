@@ -1,4 +1,4 @@
-const express = require('express')
+const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 
@@ -16,10 +16,14 @@ server.use((req, res, next) => {
 
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-
+//Users Routes
 server.use('/api/auth', userRoutes);
 server.use('/images', express.static(path.join(__dirname, 'images')));
 server.use('/api/users', userRoutes);
+
+//Posts Routes
+server.use('/messages/create', userRoutes);
+server.use('/messages/', userRoutes);
 
 server.listen(8080, function(){
     console.log('Server en écoute')

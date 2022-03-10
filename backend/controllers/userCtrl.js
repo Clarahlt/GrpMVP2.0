@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const  jwt  = require('jsonwebtoken');
 const auth = require('../middlewares/auth');
 const models = require('../models');
 
@@ -131,4 +130,29 @@ exports.profile = (req, res) => {
 exports.updateProfile = (req, res) => {
     headerAuth = req.headers['authorization'].split(' ')[1];
     userId = auth.verifyToken(headerAuth)
+    console.log({"verify": userId});
+
+    const bio = req.body.bio
+    const username = req.body.username
+
+    models.User.findOne({
+            attributes: ['id', 'username','bio'],
+            where : { id: userId}
+        })
+        .then((userFound) => {
+            if(userFound){
+                userFound.update({
+                    bio : (bio ? bio : userFound.bio),
+                    username: (username ? username : userFound.username)
+                })
+            } else {
+                return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
+            }
+            return res.status(201).json({userFound})
+        })
+        .catch(function(err){
+            return res.status(500).json({"error" : "Impossible de vérifier"})
+        })
+        
+    
 }

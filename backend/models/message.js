@@ -23,7 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     content: DataTypes.STRING,
     attachment: DataTypes.STRING,
     likes: DataTypes.INTEGER,
-    users_idusers: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Message',

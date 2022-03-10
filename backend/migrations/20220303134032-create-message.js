@@ -23,7 +23,7 @@ module.exports = {
       likes: {
         type: Sequelize.INTEGER
       },
-      users_idusers: {
+      userId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
