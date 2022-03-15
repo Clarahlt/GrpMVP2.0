@@ -16,31 +16,29 @@ exports.createPost = (req, res, next) => {
     }
 
     models.User.findOne({
-        attributes: ['id'],
-        where : { id: userId,}
+        attributes: ['id', 'username'],
+        where : { id: userId }
     })
     .then(function(userFound){
-        if(userFound) {
-                    const newPost = models.User.create({
-                        title : title,
-                        content : content,
-                        likes: 0
-                    })
-                    .then(function(newPost){
-                        return res.status(201).json({
-                            userId : newPost.id,
-                        })
-                    })
-                    .catch(function(error){
-                        return res.status(500).json({"error": "Une erreur s'est produite"})
-                    })
+        if(userFound){
+            models.Message.create({
+                title: req.body.title,
+                content: req.body.content,
+                attachment: req.body.attachment,
+                likes: 0,
+                userId: userFound.id
+            })
+            .then(function(newPost){
+                return res.status(201).json({"message" : "Votre message est en ligne :) !"})
+            }) .catch(function(err){
+                return res.status(400).json({"error" : "not created"})
+            })
         } else {
-            return res.status(409).json({"message": "Impossible de traiter la demande"})
+            return res.status(404).json({"error" : "utilisateur non trouvé"})
         }
-    })
-    .catch(function(erreur){
+    }).catch(function(erreur){
         return res.status(500).json({ "error" : "impossible de vérifier l'utilisateur"})
-    })
+    });
 },
 
 exports.listPost = (req, res, next) => {
