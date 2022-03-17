@@ -144,7 +144,7 @@ exports.dislike = (req, res) => {
         },
         function(messageFound, userFound, alreadyLiked, done){
             if(!alreadyLiked){
-                messageFound.addUser(userFound, isLike = DISLIKED)
+                messageFound.addUser(userFound, isLike = LIKED)
                 .then(function(alreadyLikedFound){
                     done(null, messageFound, userFound)
                 }).catch(function(err){
