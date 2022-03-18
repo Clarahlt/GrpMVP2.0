@@ -29,8 +29,8 @@
             <div class="row profile-content">
                 <div class="col-md-6 profile-cart">
                     <p class="name">{{lastname}} {{firstname}}</p>
-                    <p>Bio : {{ bio }}</p>
                     <p>Username: {{username}}</p>
+                    <p>Bio : {{ bio }}</p>
                     <p>Email: {{email}}</p>
                 </div>
             </div>

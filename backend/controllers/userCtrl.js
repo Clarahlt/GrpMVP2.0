@@ -84,6 +84,12 @@ exports.login = (req, res) => {
                 return res.status(200).json({
                     results : results,
                     userId: userFound.id,
+                    email: userFound.email,
+                    username: userFound.username,
+                    lastname: userFound.lastname,
+                    firstname: userFound.firstname,
+                    bio: userFound.bio,
+                    isAdmin: userFound.isAdmin,
                     token : auth.generateRandomToken(userFound)
 
                 }) } else {

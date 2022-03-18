@@ -53,7 +53,14 @@ export default {
                     password: this.password,
                     
                 })
-                .then(() => {
+                .then((response) => {
+                    localStorage.setItem('token', response.data.token);
+                    localStorage.setItem('userId', response.data.userId);
+                    localStorage.setItem('email', response.data.email);
+                    localStorage.setItem('username', response.data.username);
+                    localStorage.setItem('lastname', response.data.lastname);
+                    localStorage.setItem('firstname', response.data.firstname);
+                    localStorage.setItem('isAdmin', response.data.isAdmin);
                     this.notyf.success('Ravie de vous revoir')
                     this.$router.push('/Posts');
                 })
