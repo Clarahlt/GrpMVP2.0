@@ -5,6 +5,7 @@ const userCtrl = require('../controllers/userCtrl');
 const messageCtrl = require('../controllers/messageCtrl')
 const likesCtrl = require('../controllers/likesCtrl')
 
+
 router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
 router.get('/profile/:id', userCtrl.profile);

@@ -17,9 +17,9 @@ server.use((req, res, next) => {
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 //Users Routes
-server.use('/api/auth', userRoutes);
+server.use('/api/auth/', userRoutes);
 server.use('/images', express.static(path.join(__dirname, 'images')));
-server.use('/api/users', userRoutes);
+server.use('/api/users/', userRoutes);
 
 //Posts Routes
 server.use('/messages/create', userRoutes);

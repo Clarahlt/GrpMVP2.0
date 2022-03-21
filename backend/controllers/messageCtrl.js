@@ -3,7 +3,7 @@ const auth = require('../middlewares/auth')
 
 
 exports.createPost = (req, res, next) => {
-    headerAuth = req.headers['authorization'].split(' ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
@@ -30,9 +30,7 @@ exports.createPost = (req, res, next) => {
             })
             .then(function(newPost){
                 return res.status(201).json({"message" : "Votre message est en ligne :) !"})
-            }) .catch(function(err){
-                return res.status(400).json({"error" : "not created"})
-            })
+            }) .catch(error => res.status(400).json(error))
         } else {
             return res.status(404).json({"error" : "utilisateur non trouvé"})
         }
@@ -48,7 +46,7 @@ exports.listPost = (req, res, next) => {
     order = req.query.order
 
     models.Message.findAll({
-        order: [(order != null) ? order.split(':') : ['title', 'ASC']],
+        order: [(order != null) ? order.split(':') : ['createdAt', 'DESC']],
         attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
         limit: (!isNaN(limit)) ? limit : null,
         offset: (!isNaN(offset)) ? offset : null,

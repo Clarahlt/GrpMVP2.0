@@ -6,7 +6,7 @@ const DISLIKED = 0;
 const LIKED = 1;
 
 exports.like = (req, res, next) => {
-    headerAuth = req.headers['authorization'].split(' ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
@@ -93,7 +93,7 @@ exports.like = (req, res, next) => {
 },
 
 exports.dislike = (req, res) => {
-    headerAuth = req.headers['authorization'].split(' ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 

@@ -10,14 +10,17 @@
             </aside>
             <div class="col-md-6 txtarea-post">
                 <div class="row post">
-                    <div class="col-md-2 icon-img-profile"></div>
-                    <textarea class="col-md-10" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?..."></textarea>
+                    <div class="col-md-4 icon-img-profile"></div>
+                    <div class="col-md-8">  
+                    <textarea v-model="title" class="title-post" type="title" id="title" name="title" placeholder="Votre titre"></textarea>
+                    <textarea v-model="content" class="content-post" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?..."></textarea>
+                    </div>
                 </div>
                 <hr/>
                 <div class="row post-tools">
                     <button class="col-md-3 col-3 btn" type="button" name="photo"><i class="fa-regular fa-image"></i>Photo</button>
                     <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="fa-solid fa-clapperboard"></i>Vidéo</button>
-                    <button class="col-md-6 col-6 btn btn-secondary btn-sm btn-submit">Publier</button>
+                    <button class="col-md-6 col-6 btn btn-secondary btn-sm btn-submit" v-on:click="createPost">Publier</button>
                 </div>
             </div>
             <aside class="col-md-3 aside-agenda">
@@ -39,13 +42,15 @@
                         </div>                
                     </div>
                 </div>
-            </div>    
+            </div>
         </div>  
     </div>
 </template>
 
 <script>
 import axios from 'axios';
+import { Notyf } from 'notyf'
+import 'notyf/notyf.min.css'
 
 import Navbar from '../components/Navbar.vue'
     export default {
@@ -59,25 +64,47 @@ import Navbar from '../components/Navbar.vue'
                 username: localStorage.getItem('username'),
                 isAdmin: localStorage.getItem('isAdmin'),
                 posts: [],
-                post: '',
-                imagePost: '',
-                imagePreview: null,
-                content: '',
-                contentmodifyPost: '',
-                comments: [],
-                contentComment: '',
-                like: false,
-                postLikes: [],
-                revele: false,
-                showComment: false,
-                showCreateComment: false,
-                showInputModify: false,
+                post: "",
+                title: "",
+                content: "",
+                attachment: "vide pour le moment",
             }
         },
         created(){
             this.displayPost();
+            this.notyf = new Notyf({
+                duration: 4000,
+                position: {
+                    x: 'center',
+                    y: 'bottom'
+                }
+            });
         },
         methods: {
+            // Permet de créer un post
+            createPost() {
+                const postForm = {
+                    title: this.title,
+                    content: this.content, 
+                    attachment: this.attachment,
+                }
+                axios.post('http://localhost:3000/api/users/messages/create', postForm, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                })
+                .then(() => {
+                    window.location.reload()
+                })
+                .catch(error => {
+                    const msgerror = error.response.data;
+                    this.notyf.error(msgerror.error)
+                    
+                })
+
+            },
+
             // Permet d'afficher tous les messages
             displayPost() {
                 axios.get('http://localhost:3000/api/users/messages', {
@@ -115,17 +142,23 @@ import Navbar from '../components/Navbar.vue'
             .icon-img-profile{
                 background: url("../assets/DSCF6139.png");
                 background-size: cover;
-                width: 70px;
+                width: 80px;
+                height: 70px;
                 background-position: center;
                 margin: 0 20px;
             }
             textarea{
                 padding: 10px;
-                width: 80%;
-                height: 50px;
+                width: 120%;
                 border: lightblue 2px solid;
-                border-radius: 25px;
+                border-radius: 10px;
             }
+            .title-post{
+                    height: 30px;
+                }
+                .content-post{
+                    height: 80px;
+                }
         }
     }
     .post-tools{

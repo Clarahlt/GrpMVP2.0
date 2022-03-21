@@ -1,49 +1,55 @@
 <template> 
-    <div v-if="modify" class="modaleBloc">
-        <div @click="modifyProfile" class="modaleBloc__overlay"></div>
+    <div v-if="revele" v-on:click="displayModify" class="modaleBloc">
+        <div class="modaleBloc__overlay"></div>
         
         <div class="modaleBloc__card">
             <div class="modaleBloc__card__title">
                 <h2>Informations personnelles</h2>
 
-                <div class="modaleBloc__card__title__close">
-                    <i @click="modifyProfile" class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
+                <div v-on:click="displayModify" class="modaleBloc__card__title__close">
+                    <i class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
                 </div>
                 <form class="modify-form">
+
+                    <div class="form-input row">
+                        <div class="img-content">
+                            <div class="img-profile">
+                                <button class="btn btn-img-profile" type="button"><i class="fa-solid fa-file-arrow-up"></i></button>
+                            </div>
+                        </div>
+                        <label for="img-profile" class="form-img-profile">Changer ma photo de profil</label>
+                    </div>
+
                     <div class="form-input row">
                         <label for="username" class="form-username col-md-4">Username</label>
-                        <input class="col-md-8" type="username" id="username" name="username" v-model="username" placeholder="username">
+                        <input class="col-md-8" type="text" id="username" name="username" v-model="username" placeholder="username">
                     </div>
 
                     <div class="form-input row">
                         <label for="lastname" class="form-lastname col-md-4">Nom</label>
-                        <input class="col-md-8" type="lastname" id="lastname" name="lastname" v-model="lastname" placeholder="lastname">
+                        <input class="col-md-8" type="text" id="lastname" name="lastname" v-model="lastname" placeholder="lastname">
                     </div>
 
                     <div class="form-input row">
                         <label for="name" class="form-name col-md-4">Prénom</label>
-                        <input class="col-md-8" type="name" id="name" name="name" v-model="name" placeholder="name">
+                        <input class="col-md-8" type="text" id="firstname" name="firstname" v-model="firstname" placeholder="firstname">
                     </div>
 
                     <div class="form-input row">
-                        <label for="birth" class="form-birth col-md-4">Date de naissance:</label>
-                        <input class="col-md-8" type="birth" id="birth" name="birth" v-model="birth" placeholder="birth">
+                        <label for="bio" class="form-bio col-md-4">Bio:</label>
+                        <input class="col-md-8" type="text" id="bio" name="bio" v-model="bio" placeholder="bio">
                     </div>
 
                     <div class="form-input row">
                         <label for="mail" class="form-mail col-md-4">Email</label>
-                        <input class="col-md-8" type="email" id="mail" name="mail" v-model="email" placeholder="email">
+                        <input class="col-md-8" type="email" id="email" name="email" v-model="email" placeholder="email">
                     </div>
 
-                    <div class="form-input row">
-                        <label for="password" class="form-password col-md-4">Mot de passe</label>
-                        <input class="col-md-8" type="password" id="password" name="password" v-model="password" placeholder="Tapez votre mot de passe">
-                    </div>
-                    <button class="btn modaleBloc__card__button">Enregistrer</button>
+                    <button v-on:click="updateProfile" class="btn modaleBloc__card__button">Enregistrer</button>
 
                     <div class="delete-account row">
                     <button class="btn display btn-danger">
-                    <DeleteAccount v-bind:revele="revele" v-bind:displayDeleteContent="displayDeleteContent" id="displayDeleteContent" />
+                    <DeleteAccount id="displayDeleteContent" />
                     Supprimer mon compte</button>
                     </div>
 
@@ -57,15 +63,51 @@
 
 
 <script>
+import axios from 'axios'
 import DeleteAccount from '../components/DeleteAccount.vue' 
-
-
     export default {
         name: 'ModifyProfile',
         components: {
             DeleteAccount
         },
-        props: ['modify', 'modifyProfile'],
+        props: ['revele', 'displayModify'],
+        data() {
+            return {
+                user: "",
+                username: "",
+                lastname: "",
+                firstname: "",
+                bio: "",
+                email: "",
+            }
+        },
+        methods:{
+            updateProfile(){
+                const userId = localStorage.getItem('userId')
+                const postForm = {
+                    username: this.username,
+                    lastname: this.lastname, 
+                    firstname: this.firstname,
+                    bio: this.bio,
+                    email: this.email
+                }
+                axios.put('http://localhost:3000/api/users/profile/' + userId, postForm, {
+					headers: {
+                        'Content-Type' : "application/json",
+						'Authorization': 'Bearer ' + localStorage.getItem('token')
+					}
+				})
+                .then((response) => {
+                    this.user = response.data.user
+                    window.location.reload();
+                })
+                .catch((error) => {
+                    const msgerror = error.response.data;
+                    this.notyf.error(msgerror.error)
+                    
+                })
+            }
+        }
         
     }
 </script>

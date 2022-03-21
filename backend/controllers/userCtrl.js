@@ -109,7 +109,7 @@ exports.login = (req, res) => {
 },
 
 exports.profile = (req, res) => {
-    headerAuth = req.headers['authorization'].split(' ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
@@ -123,7 +123,7 @@ exports.profile = (req, res) => {
      })
     .then(function(user){
         if(user){
-            return res.status(201).json({user : user})
+            return res.status(200).json({user : user})
         } else {
             res.status(404).json({ "error" : "Utilisateur non autorisé"});
         }
@@ -134,22 +134,28 @@ exports.profile = (req, res) => {
 },
 
 exports.updateProfile = (req, res) => {
-    headerAuth = req.headers['authorization'].split(' ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
-    const bio = req.body.bio
     const username = req.body.username
+    const lastname = req.body.lastname
+    const firstname = req.body.firstname
+    const bio = req.body.bio
+    const email = req.body.email
 
     models.User.findOne({
-            attributes: ['id', 'username','bio'],
+            attributes: ['id', 'username', 'lastname', 'firstname', 'bio', 'email'],
             where : { id: userId}
         })
         .then((userFound) => {
             if(userFound){
                 userFound.update({
+                    username: (username ? username : userFound.username),
+                    lastname: (lastname ? lastname : userFound.lastname),
+                    firstname: (firstname ? firstname : userFound.firstname),
                     bio : (bio ? bio : userFound.bio),
-                    username: (username ? username : userFound.username)
+                    email: (email ? email : userFound.email),
                 })
             } else {
                 return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
