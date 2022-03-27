@@ -3,13 +3,15 @@ const router = express.Router();
 
 const userCtrl = require('../controllers/userCtrl');
 const messageCtrl = require('../controllers/messageCtrl')
-const likesCtrl = require('../controllers/likesCtrl')
+const likesCtrl = require('../controllers/likesCtrl');
+
+const multer = require('../middlewares/multer-config');
 
 
 router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
 router.get('/profile/:id', userCtrl.profile);
-router.put('/profile/:id', userCtrl.updateProfile);
+router.put('/profile/:id', multer, userCtrl.updateProfile);
 
 router.post('/messages/create', messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);

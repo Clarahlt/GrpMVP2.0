@@ -8,8 +8,10 @@
             <div class="row background-profile">
                 <div class="col-md-4 img-content">
                     <div class="img-profile">
-                    <button class="btn btn-img-profile" type="button"><i class="fa-solid fa-file-arrow-up"></i></button>
+                        <input type="file" ref="fileUpload" name="imageProfile" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+                        <button button @click="uploadFile" type="button" class="btn"><i class="fa-solid fa-file-arrow-up"></i></button>
                     </div>
+                    <ProfileImage :src="user.imageProfile" class="profile__photo__image"/>
                 </div>
                 <div class="col-md-8 navbar-profile">
                     <nav>
@@ -43,12 +45,14 @@
 import axios from 'axios'
 import Navbar from '../components/Navbar.vue'
 import ModifyProfile from '../components/ModifyProfile.vue'
+import ProfileImage from '../components/ProfileImage.vue'
 
     export default {
         name: 'Profile',
         components: {
             Navbar,
             ModifyProfile,
+            ProfileImage,
         },
         data(){
             return{
@@ -56,6 +60,7 @@ import ModifyProfile from '../components/ModifyProfile.vue'
                 user: "",
                 username: "",
                 lastname: "",
+                imageProfile: null,
             }
         },
         created() {
@@ -73,6 +78,7 @@ import ModifyProfile from '../components/ModifyProfile.vue'
 				})
 				.then(response => {
 					this.user = response.data.user;
+                    localStorage.setItem('imageProfile', this.user.imageProfile)
 				})
 				.catch(error => {
 					const msgerror = error.response.data
@@ -82,7 +88,37 @@ import ModifyProfile from '../components/ModifyProfile.vue'
 			},
             displayModify(){
                 this.revele = !this.revele
+            },
+            onFileSelected(event) {
+				this.$refs.fileUpload.click()
+				this.imageProfile = event.target.files[0]
+                console.log(this.imageProfile)
+			},
+            uploadFile(){
+                const userId = localStorage.getItem('userId')
+                const formData = new FormData();
+                formData.append("imageProfile", this.imageProfile)
+
+                axios.put('http://localhost:3000/api/users/profile/' + userId, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+						'Authorization': 'Bearer ' + localStorage.getItem('token')
+					}
+                })
+                .then((res) => {
+                    const userImg = res.data.userFound.imageProfile
+                    localStorage.setItem("imageProfile", userImg)
+                    window.location.reload();
+                }).catch(error => {
+					const msgerror = error.res.data
+					this.notyf.error(msgerror.error)
+				})
             }
+            
+
+
+
+        
         }
     }
 </script>
@@ -148,9 +184,7 @@ import ModifyProfile from '../components/ModifyProfile.vue'
         .name{
             font-size: 35px;
             font-weight: bold;
-
         }
     }
 }
-
 </style>

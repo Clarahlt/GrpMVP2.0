@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
 const models = require('../models');
-
 // Regex de validation
  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 // const passwordRegex = /^((?=.*[a-z])+(?=.*[A-Z])+(?=.*[0-9])+(?=.*[!@#\$%\^&\*])).{8,20}$/;
@@ -118,7 +117,7 @@ exports.profile = (req, res) => {
     }
 
     models.User.findOne({
-    attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio'],
+    attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio', 'imageProfile'],
     where: { id : userId }
      })
     .then(function(user){
@@ -143,19 +142,26 @@ exports.updateProfile = (req, res) => {
     const firstname = req.body.firstname
     const bio = req.body.bio
     const email = req.body.email
+    const userPic = req.file ?
+    {
+     ...req.body,
+    imageProfile: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+    console.log(userPic)
 
     models.User.findOne({
-            attributes: ['id', 'username', 'lastname', 'firstname', 'bio', 'email'],
+            attributes: ['id', 'username', 'lastname', 'firstname', 'bio', 'email', 'imageProfile'],
             where : { id: userId}
         })
         .then((userFound) => {
             if(userFound){
-                userFound.update({
+                userFound.update(userPic, {
                     username: (username ? username : userFound.username),
                     lastname: (lastname ? lastname : userFound.lastname),
                     firstname: (firstname ? firstname : userFound.firstname),
                     bio : (bio ? bio : userFound.bio),
                     email: (email ? email : userFound.email),
+                    imageProfile: (userPic ? userPic : userFound.imageProfile)
                 })
             } else {
                 return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})

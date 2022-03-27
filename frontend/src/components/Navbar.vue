@@ -9,20 +9,20 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
                 <ul class="navbar-nav nav__links">
                     <li class="nav-item">
-                        <router-link to='/posts' class="display-post"><i class="fa-solid fa-house"></i>Accueil</router-link>
+                        <router-link to='/posts' class="display-post"><i class="bi bi-house-fill"></i>Accueil</router-link>
                     </li>
 
 
                     <li class="nav-item">
-                        <router-link to='/posts' class="display-post"><i class="fa-regular fa-envelope"></i>Messagerie</router-link>
+                        <router-link to='/posts' class="display-post"><i class="bi bi-envelope"></i>Messagerie</router-link>
                     </li>
                     
                     <li class="nav-item">
-                        <router-link to='/profile' class="display-profile"><i class="fa-regular fa-user"></i>Mon profil</router-link>
+                        <router-link to='/profile' class="display-profile"><i class="bi bi-person"></i>Mon profil</router-link>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav__links__logoutLink">Déconnexion <i class="fas fa-sign-out-alt"></i></button>    
+                        <button class="nav__links__logoutLink">Déconnexion <i class="bi bi-door-closed"></i></button>    
                     </li>
                 </ul>
             </div>
