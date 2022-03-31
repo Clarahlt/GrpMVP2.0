@@ -20,10 +20,11 @@
                     <li class="nav-item">
                         <router-link to='/profile' class="display-profile"><i class="bi bi-person"></i>Mon profil</router-link>
                     </li>
-
+                    
                     <li class="nav-item">
-                        <button class="nav__links__logoutLink">Déconnexion <i class="bi bi-door-closed"></i></button>    
+                        <Logout class="logout"/>
                     </li>
+                    
                 </ul>
             </div>
         </nav>
@@ -33,8 +34,12 @@
 </template>
 
 <script>
+import Logout from '../components/Logout.vue'
     export default {
-        name: 'Navbar'
+        name: 'Navbar',
+        components: {
+            Logout
+        }
     }
 </script>
 

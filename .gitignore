@@ -1,2 +1,5 @@
 backend/node_modules
+backend/images
+backend/config
+
 frontend/node_modules

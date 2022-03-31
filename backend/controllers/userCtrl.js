@@ -174,3 +174,26 @@ exports.updateProfile = (req, res) => {
         
     
 }
+
+exports.deleteAccount = (req,res) => {
+    headerAuth = req.headers['authorization'].split('Bearer ')[1]
+    userId = auth.verifyToken(headerAuth)
+    console.log({"verify": userId});
+
+    models.User.findOne({
+        attributes: ['id'],
+        where : { id: userId}
+    }).then((userFound) => {
+        if(userFound){
+            models.User.destroy({
+                where: { id : userId }
+            }).then(()=> res.status(200).json({"message" : "Votre compte a été supprimé !"}))
+            .catch(()=> res.status(500).json({ "error" : "⚠ Oops, une erreur s\'est produite !"}))
+        } else {
+            return res.status(404).json({"error" : "Utilisateur non trouvé"})
+        }
+    })
+    .catch(function(err){
+        return res.status(500).json({"error" : "Impossible de vérifier l'utilisateur"})
+    })
+}

@@ -29,7 +29,7 @@
             </aside>
 
 
-            <div class="displayPost" v-for="post in posts" :key="post.postId">
+            <div class="displayPost" v-for="post in posts" :key="post.id" :id="post.id">
                 <div class="displayPost__item">
                     <div class="row display-content-post">
                         <div :contentPostId="post.id" class="card-post col-md-6">
@@ -45,15 +45,15 @@
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="#">Modifier</a>
                                             <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Supprimer</a> 
+                                            <a :messageId="post.id" @click="deletePost(post.id)" class="dropdown-item" href="#">Supprimer</a> 
                                         </div>
                                     </div>
                                 </div>
                                 <p class="card-text">{{ post.content }}</p>
                                 <div class="card-footer text-muted">
-                                    <p>Publié le {{ post.createdAt }}</p>
-                                    <p>{{ post.likes }}</p>
-                                </div>
+                                    <p class="post-date">Publié le {{ dateFormat(post.createdAt) }}</p>
+                                    <Likes v-bind:post="post"/>                                    </div>
+                                
                             </div>
                         </div>                
                     </div>
@@ -65,16 +65,19 @@
 
 <script>
 import axios from 'axios';
+import moment from 'moment'
 import { Notyf } from 'notyf'
 import 'notyf/notyf.min.css'
 
 import Navbar from '../components/Navbar.vue'
 import ProfileImage from '../components/ProfileImage.vue'
+import Likes from '../components/Likes.vue'
     export default {
         name: 'Posts',
         components: {
             Navbar,
-            ProfileImage
+            ProfileImage,
+            Likes
         },
         data(){
             return {
@@ -83,10 +86,10 @@ import ProfileImage from '../components/ProfileImage.vue'
                 isAdmin: localStorage.getItem('isAdmin'),
                 imageProfile: localStorage.getItem('imageProfile'),
                 posts: [],
-                post: "",
                 title: "",
                 content: "",
                 attachment: "vide pour le moment",
+                likes: "",
             }
         },
         created(){
@@ -135,13 +138,37 @@ import ProfileImage from '../components/ProfileImage.vue'
                 })
                 .then(response => {
                     this.posts = response.data;
+                    console.log(this.posts)
     
                 })
                 .catch(error => {
                     const msgerror = error.response.data
                     this.notyf.error(msgerror.error)
                 })
-            },        
+            },
+            // Permet d'afficher la date de publication au bon format
+            dateFormat(date){
+                if (date) {
+                    return moment(String(date)).format('DD/MM/YYYY')
+                }
+            },
+            deletePost(id){
+                const messageId = id;
+               
+                axios.delete('http://localhost:3000/api/users/messages/' + messageId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then(() => {
+                    this.displayPost();
+                })
+                .catch(error => {
+                    const msgerror = error.response.data
+                    this.notyf.error(msgerror.error)
+                })                
+            }
         },
         
     }
@@ -215,25 +242,34 @@ import ProfileImage from '../components/ProfileImage.vue'
         border-top: 1px lightgrey solid;
         .modele-post{
             margin: auto;
-        .card-title{
-            display: inline-flex;
-            .icon-user-post{
-                background-size: cover;
-                width: 70px;
-                height: 60px;
-                background-position: center;
-                margin: 5px 0px 0px 40px;
+            .card-title{
+                display: inline-flex;
+                .icon-user-post{
+                    background-size: cover;
+                    width: 70px;
+                    height: 60px;
+                    background-position: center;
+                    margin: 5px 0px 0px 40px;
+                }
+                .title{
+                    text-align: left;
+                    margin: 10px 0px 0px 30px;
+                }
+                .dropdown{
+                    position: absolute;
+                    right: 0px;
+                    margin: 5px;
+                }
             }
-            .title{
-                text-align: left;
-                margin: 10px 0px 0px 30px;
+            .card-footer{
+                display: flex;
+                .post-likes{
+                    position: absolute;
+                    right: 20px;
+                    display: flex;
+                }
             }
-            .dropdown{
-                position: absolute;
-                right: 0px;
-                margin: 5px;
-            }
-        }}
+        }
     }
 }
 </style>

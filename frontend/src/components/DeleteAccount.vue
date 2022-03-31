@@ -1,13 +1,13 @@
 <template> 
-    <div v-if="revele" class="modaleBloc">
-        <div @click="displayModale" class="modaleBloc__overlay"></div>
+    <div v-if="display" class="modaleBloc">
+        <div @click="displayDeleteBloc" class="modaleBloc__overlay"></div>
         
         <div class="modaleBloc__card">
             <div class="modaleBloc__card__title">
                 <h2>Etes-vous sûr de vouloir supprimer votre compte ?</h2>
                 <p>(Cette action est irréversible)</p>
                 <div class="modaleBloc__card__title__close">
-                    <i @click="displayModale" class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
+                    <i @click="displayDeleteBloc" class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
                 </div>
             </div>
 
@@ -18,44 +18,44 @@
 
 
 <script>
-    // import axios from 'axios'
-    // import { Notyf } from 'notyf'
-    // import 'notyf/notyf.min.css'
+    import axios from 'axios'
+    import { Notyf } from 'notyf'
+    import 'notyf/notyf.min.css'
 
 
     export default {
-        name: 'ModaleDeleteAccount',
-        props: ['revele', 'displayModale'],
+        name: 'DeleteAccount',
+        props: ['display', 'displayDeleteBloc'],
         created() {
-            // this.notyf = new Notyf({
-            //     duration: 2000,
-            //     position: {
-            //         x: 'center',
-            //         y: 'bottom'
-            //     }
-            // });
+            this.notyf = new Notyf({
+                duration: 2000,
+                position: {
+                    x: 'center',
+                    y: 'bottom'
+                }
+            });
         },
         methods: {
             // Permet de supprimer le compte
-            // deleteAccount(){
-            //     const userId = localStorage.getItem('userId');
+            deleteAccount(){
+                const userId = localStorage.getItem('userId');
 
-            //     axios.delete('http://localhost:3000/api/user/' + userId, {
-            //         headers: {
-            //             'Content-Type' : 'application/json',
-            //             'Authorization': 'Bearer ' + localStorage.getItem('token')
-            //         }
-            //     })
-            //     .then(() => {
-            //         this.notyf.success('Votre compte a bien été supprimé')
-            //         localStorage.clear();
-            //         this.$router.push('/');
-            //     })
-            //     .catch(error => {
-            //         const msgerror = error.response.data
-            //         this.notyf.error(msgerror.error)
-            //     })
-            // }
+                axios.delete('http://localhost:3000/api/users/profile/' + userId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then(() => {
+                    this.notyf.success('Votre compte a bien été supprimé')
+                    localStorage.clear();
+                    this.$router.push('/');
+                })
+                .catch(error => {
+                    const msgerror = error.response.data
+                    this.notyf.error(msgerror.error)
+                })
+            }
         }
     }
 </script>

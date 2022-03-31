@@ -8,10 +8,9 @@
             <div class="row background-profile">
                 <div class="col-md-4 img-content">
                     <div class="img-profile">
+                         <button button @click="uploadFile" type="button" class="btn"><ProfileImage :src="user.imageProfile" class="profile__photo__image"/></button>
                         <input type="file" ref="fileUpload" name="imageProfile" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
-                        <button button @click="uploadFile" type="button" class="btn"><i class="fa-solid fa-file-arrow-up"></i></button>
                     </div>
-                    <ProfileImage :src="user.imageProfile" class="profile__photo__image"/>
                 </div>
                 <div class="col-md-8 navbar-profile">
                     <nav>
@@ -43,6 +42,9 @@
 
 <script>
 import axios from 'axios'
+import { Notyf } from 'notyf'
+import 'notyf/notyf.min.css'
+
 import Navbar from '../components/Navbar.vue'
 import ModifyProfile from '../components/ModifyProfile.vue'
 import ProfileImage from '../components/ProfileImage.vue'
@@ -65,6 +67,13 @@ import ProfileImage from '../components/ProfileImage.vue'
         },
         created() {
 			this.displayProfile(); 
+            this.notyf = new Notyf({
+                duration: 4000,
+                position: {
+                    x: 'center',
+                    y: 'bottom'
+                }
+            });
 		},
         methods: {
             displayProfile() {
@@ -98,8 +107,10 @@ import ProfileImage from '../components/ProfileImage.vue'
                 const userId = localStorage.getItem('userId')
                 const formData = new FormData();
                 formData.append("imageProfile", this.imageProfile)
-
-                axios.put('http://localhost:3000/api/users/profile/' + userId, formData, {
+                if(this.imageProfile === null){
+					this.notyf.error("La photo ne peut contenir null")
+                } else {
+                    axios.put('http://localhost:3000/api/users/profile/' + userId, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
 						'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -108,12 +119,14 @@ import ProfileImage from '../components/ProfileImage.vue'
                 .then((res) => {
                     const userImg = res.data.userFound.imageProfile
                     localStorage.setItem("imageProfile", userImg)
+                    document.getElementById('')
                     window.location.reload();
                 }).catch(error => {
 					const msgerror = error.res.data
 					this.notyf.error(msgerror.error)
 				})
-            }
+                }
+            },
             
 
 

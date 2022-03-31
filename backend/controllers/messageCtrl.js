@@ -66,4 +66,25 @@ exports.listPost = (req, res, next) => {
         console.log(err)
         res.status(500).json({"error": "invalid fields"})
     })
+},
+exports.deletePost = (req,res) => {
+    headerAuth = req.headers['authorization'].split('Bearer ')[1];
+    userId = auth.verifyToken(headerAuth)
+    console.log({"verify": userId});
+    
+    id = req.body.id
+    console.log(id);
+
+    models.Message.findOne({
+        attributes: ['id', 'userId'],
+        where: {
+            messageId: id,
+            userId : userId
+        }
+    }).then(() => {
+        return res.status(200).json({"message": "Votre message a bien été supprimé"})
+    }).catch((err) => {
+        console.log(err)
+        res.status(500).json({"error": "invalid fields"})
+    })
 }

@@ -12,12 +12,15 @@ router.post('/signup', userCtrl.signup);
 router.post('/login', userCtrl.login);
 router.get('/profile/:id', userCtrl.profile);
 router.put('/profile/:id', multer, userCtrl.updateProfile);
+router.delete('/profile/:id', userCtrl.deleteAccount);
 
 router.post('/messages/create', messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);
 
-router.post('/messages/:messageId/vote/like', likesCtrl.like);
-router.post('/messages/:messageId/vote/dislike', likesCtrl.dislike);
+// router.get('/messages/:messageId', likesCtrl.getLikes);
+router.post('/messages/:messageId/like', likesCtrl.like);
+router.post('/messages/:messageId/dislike', likesCtrl.dislike);
+router.delete('/messages/:messageId', messageCtrl.deletePost);
 
  
 module.exports = router;

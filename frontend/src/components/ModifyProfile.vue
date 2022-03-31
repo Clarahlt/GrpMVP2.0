@@ -48,8 +48,8 @@
                     <button v-on:click="updateProfile" class="btn modaleBloc__card__button">Enregistrer</button>
 
                     <div class="delete-account row">
-                    <button class="btn display btn-danger">
-                    <DeleteAccount id="displayDeleteContent" />
+                    <button v-on:click="deleteProfile" class="btn display btn-danger">
+                    <DeleteAccount v-bind:display="display" v-bind:displayDeleteBloc="displayDeleteBloc" id="displayDeleteBloc" />
                     Supprimer mon compte</button>
                     </div>
 
@@ -73,6 +73,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
         props: ['revele', 'displayModify'],
         data() {
             return {
+                display: false,
                 user: "",
                 username: "",
                 lastname: "",
@@ -106,6 +107,9 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                     this.notyf.error(msgerror.error)
                     
                 })
+            },
+            deleteProfile(){
+                this.display = !this.display
             }
         }
         

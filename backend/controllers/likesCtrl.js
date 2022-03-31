@@ -6,7 +6,7 @@ const DISLIKED = 0;
 const LIKED = 1;
 
 exports.like = (req, res, next) => {
-    headerAuth = req.headers['authorization'].split('Bearer ')[1];
+    headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
@@ -181,3 +181,27 @@ exports.dislike = (req, res) => {
         }
     });
 }
+
+
+// exports.getLikes= (req, res) => {
+//     headerAuth = req.headers['authorization'].split('Bearer ')[1]
+//     userId = auth.verifyToken(headerAuth)
+//     console.log({"verify": userId});
+    
+//     models.Like.findOne({
+//         where: {
+//             userId: userId,
+//             messageId: req.params.messageId,
+//         }
+//     })
+//         .then((likePostFound) => {
+//             if(likePostFound){
+//                 return res.status(200).json(likePostFound)
+//             } else {
+//                 res.status(404).json({ "error" : "Aucun like trouvé"});
+//             }
+//          })
+//          .catch(function(error){
+//              return res.status(500).json({"error" : "impossible de récupérer les likes "})
+//          })
+// }
