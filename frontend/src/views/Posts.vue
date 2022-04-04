@@ -29,7 +29,7 @@
             </aside>
 
 
-            <div class="displayPost" v-for="post in posts" :key="post.id" :id="post.id">
+            <div class="displayPost" v-for="post in posts" :key="post.id">
                 <div class="displayPost__item">
                     <div class="row display-content-post">
                         <div :contentPostId="post.id" class="card-post col-md-6">

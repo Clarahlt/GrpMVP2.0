@@ -1,10 +1,10 @@
 <template>
     <div class="post-likes">
-        <button :id="post.id" @click="postLike()" class="heart_action">
+        <button @click="postLike()" class="heart_action">
             <i class="bi bi-heart empty_heart"></i>
             <i class="bi bi-heart-fill full_heart"></i>
         </button>
-        <p class="likes">{{ post.likes }}</p>
+        <p :id="post.id" class="likes">{{ post.likes }}</p>
     </div>
 </template>
 
@@ -16,10 +16,10 @@
 
     export default {
         name: 'Likes',
-        props:['post'],
+        props:['post', 'likes'],
         data(){
             return {
-                userId: localStorage.getItem('userId')
+                userId: localStorage.getItem('userId'),
             }
         },
         created(){
@@ -36,51 +36,128 @@
             postLike(){
                 const messageId = this.post.id
                 const userId = this.userId
-                const postLikes = this.post.likes
-                console.log(userId);
-                console.log(messageId);
-                console.log(postLikes);
-
-                if(postLikes >= 0){
-                    axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like', {
-                        userId,
-                        messageId,
-                        isLike : true
-                    },{
-                        headers: {
-                            'Content-Type' : 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
+                axios.get('http://localhost:3000/api/users/messages/' + messageId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then((res) => {
+                    const like = res.data.like
+                    if(like.isLike === 0){
+                        axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like',{
+                            messageId,
+                            userId
+                        }, {
+                            headers: {
+                                'Content-Type' : 'application/json',
+                                'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                            }
+                        }).then((res) => {
+                            const likesCounter = res.data.likesCounter.likes
+                            const refreshLikes = document.getElementById(this.post.id)
+                            refreshLikes.innerHTML = likesCounter
+                        })
+                        .catch((error) => {
+                            console.log(error.response.data);
+                        })
+                    } else {
+                        if(like.isLike === 1){
+                        axios.post('http://localhost:3000/api/users/messages/' + messageId + '/dislike', {
+                            messageId,
+                            userId
+                        }, {
+                            headers: {
+                                'Content-Type' : 'application/json',
+                                'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                            }
+                        })
+                        .then((res) => {
+                            const likesCounter = res.data.messageFound.likes
+                            const refreshLikes = document.getElementById(this.post.id)
+                            refreshLikes.innerHTML = likesCounter
+                        })
+                        .catch((error) => {
+                            console.log(error.response.data);
+                        })
                         }
-                    }).then((res) => {
-                        const isLike = res.data
-                        const user = res.data.userFound
-                        console.log(isLike);
-                        console.log(user);
-                    }).catch((error) => {
-                        const msgerror = error.response.data
-                        this.notyf.error(msgerror.error)
-                    })
-                } else {
-                    const userFound = this.post.userId
-                    console.log(userFound);
-                    
-                    axios.post('http://localhost:3000/api/users/messages/' + messageId + '/dislike', {
-                        isLike : this.isLike - 1
-                    }, {
-                        headers: {
-                            'Content-Type' : 'application/json',
-                            'Authorization': 'Bearer ' + localStorage.getItem('token')
-                        }
-                    }).then((res) => {
-                        const isLike = res.data
-                        window.location.relaod(isLike)
-                    }).catch((error)=> {
-                        const msgerror = error.response.data
-                        this.notyf.error(msgerror.error)
-                    })
-                }
-
+                    }
+                })
+                .catch((error) => {
+                    console.log(error.response.data);
+                })
             }
+            // postLike(){
+            //     const post = this.post
+            //     const messageId = this.post.id
+            //     console.log(post);
+            //     console.log(post.userId)
+            //     console.log(this.userId);
+                
+            //         axios.get('http://localhost:3000/api/users/messages/' + messageId, {
+            //             headers: {
+            //                 'Content-Type' : 'application/json',
+            //                 'Authorization': 'Bearer ' + localStorage.getItem('token')
+            //             }
+            //         }).then((res) => {
+            //             const like = res.data.allLikes[0]
+            //             console.log(like);
+            //             if(like.isLike === 0){
+
+            //                 axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like', {
+            //                     messageId,
+            //                     userId :  this.userId,
+            //                 },{
+            //                     headers: {
+            //                         'Content-Type' : 'application/json',
+            //                         'Authorization': 'Bearer ' + localStorage.getItem('token')
+            //                     }
+            //                 }).then(() => {
+            //                     this.updateLikeCounter();
+            //                 }).catch((error) => {
+            //                     const msgerror = error.res.data
+            //                     this.notyf.error(msgerror.error)
+            //                 })
+            //             } else {
+            //                 if(like.isLike === 1){
+            //                     axios.post('http://localhost:3000/api/users/messages/' + messageId + '/dislike', {
+            //                         messageId,
+            //                         userId : this.userId,
+            //                     }, {
+            //                         headers: {
+            //                             'Content-Type' : 'application/json',
+            //                             'Authorization': 'Bearer ' + localStorage.getItem('token')
+            //                         }
+            //                     }).then(() => {
+            //                         this.updateLikeCounter();
+            //                     }).catch((error) => {
+            //                         const msgerror = error.res.data
+            //                         this.notyf.error(msgerror.error)
+            //                     })
+            //                 }
+            //             }
+            //         }).catch((error) => {
+            //             const msgerror = error.res.data
+            //             this.notyf.error(msgerror.error)
+            //         })
+
+            // },
+            // updateLikeCounter(){
+            //     const messageId = this.post.id
+            //         axios.get('http://localhost:3000/api/users/messages/' + messageId, {
+            //             headers: {
+            //                 'Content-Type' : 'application/json',
+            //                 'Authorization': 'Bearer ' + localStorage.getItem('token')
+            //             }
+            //         }).then((res) => {
+            //             const likeCounter = res.data.messageFound
+            //             const refreshLikes = document.getElementById(this.post.id)
+            //             console.log(refreshLikes);
+            //             refreshLikes.innerHTML = likeCounter.likes
+            //         }).catch((error) => {
+            //             const msgerror = error.res.data
+            //             this.notyf.error(msgerror.error)
+            //         })
+            // }
         }
     }
 </script>

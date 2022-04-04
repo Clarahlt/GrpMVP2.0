@@ -17,7 +17,7 @@ router.delete('/profile/:id', userCtrl.deleteAccount);
 router.post('/messages/create', messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);
 
-// router.get('/messages/:messageId', likesCtrl.getLikes);
+router.get('/messages/:messageId', likesCtrl.getLikes)
 router.post('/messages/:messageId/like', likesCtrl.like);
 router.post('/messages/:messageId/dislike', likesCtrl.dislike);
 router.delete('/messages/:messageId', messageCtrl.deletePost);
