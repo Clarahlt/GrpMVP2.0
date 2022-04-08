@@ -89,7 +89,7 @@ exports.like = (req, res, next) => {
                 messageFound.addUser(userFound, {isLike : LIKED})
                 .then(function(alreadyLikedFound){
                     done(null, messageFound, userFound, alreadyLikedFound)
-                }).catch(error => res.status(500).json({"error" : "Cannot update message"}))
+                }).catch((error) => res.status(500).json({"error" : "Cannot update message"}))
             } else {
                 if(alreadyLiked.isLike === DISLIKED){
                     alreadyLiked.update({

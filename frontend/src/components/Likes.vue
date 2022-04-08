@@ -1,6 +1,6 @@
 <template>
     <div class="post-likes">
-        <button @click="postLike()" class="heart_action">
+        <button @click="postLike()" :name="post.id" class="heart_action">
             <i class="bi bi-heart empty_heart"></i>
             <i class="bi bi-heart-fill full_heart"></i>
         </button>
@@ -30,6 +30,7 @@
                     y: 'bottom'
                 }
             });
+            this.displayHeartColor()
         },
         methods:{
             // Permet d'aimer un message
@@ -43,10 +44,10 @@
                     }
                 }).then((res) => {
                     const like = res.data.like
-                    if(like.isLike === 0){
+                    if(like === null || like.isLike === 0){
                         axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like',{
                             messageId,
-                            userId
+                            userId,
                         }, {
                             headers: {
                                 'Content-Type' : 'application/json',
@@ -56,6 +57,8 @@
                             const likesCounter = res.data.likesCounter.likes
                             const refreshLikes = document.getElementById(this.post.id)
                             refreshLikes.innerHTML = likesCounter
+                            const fillHeart = document.getElementsByName(this.post.id)[0]
+                            fillHeart.className = 'heart_action display_heart_color'
                         })
                         .catch((error) => {
                             console.log(error.response.data);
@@ -75,6 +78,8 @@
                             const likesCounter = res.data.messageFound.likes
                             const refreshLikes = document.getElementById(this.post.id)
                             refreshLikes.innerHTML = likesCounter
+                            const fillHeart = document.getElementsByName(this.post.id)[0]
+                            fillHeart.className = 'heart_action'
                         })
                         .catch((error) => {
                             console.log(error.response.data);
@@ -85,79 +90,26 @@
                 .catch((error) => {
                     console.log(error.response.data);
                 })
+            },
+
+            displayHeartColor(){
+                const messageId = this.post.id
+                axios.get('http://localhost:3000/api/users/messages/' + messageId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization' : 'Bearer ' + localStorage.getItem('token')
+                    }
+                }).then((res) => {
+                    const like = res.data.like
+                    console.log(like);
+                    if(like.isLike == 1){
+                        const fillHeart = document.getElementsByName(this.post.id)[0]
+                        fillHeart.className = 'heart_action display_heart_color'
+                    }
+                }).catch((error) => {
+                    console.log(error);
+                })
             }
-            // postLike(){
-            //     const post = this.post
-            //     const messageId = this.post.id
-            //     console.log(post);
-            //     console.log(post.userId)
-            //     console.log(this.userId);
-                
-            //         axios.get('http://localhost:3000/api/users/messages/' + messageId, {
-            //             headers: {
-            //                 'Content-Type' : 'application/json',
-            //                 'Authorization': 'Bearer ' + localStorage.getItem('token')
-            //             }
-            //         }).then((res) => {
-            //             const like = res.data.allLikes[0]
-            //             console.log(like);
-            //             if(like.isLike === 0){
-
-            //                 axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like', {
-            //                     messageId,
-            //                     userId :  this.userId,
-            //                 },{
-            //                     headers: {
-            //                         'Content-Type' : 'application/json',
-            //                         'Authorization': 'Bearer ' + localStorage.getItem('token')
-            //                     }
-            //                 }).then(() => {
-            //                     this.updateLikeCounter();
-            //                 }).catch((error) => {
-            //                     const msgerror = error.res.data
-            //                     this.notyf.error(msgerror.error)
-            //                 })
-            //             } else {
-            //                 if(like.isLike === 1){
-            //                     axios.post('http://localhost:3000/api/users/messages/' + messageId + '/dislike', {
-            //                         messageId,
-            //                         userId : this.userId,
-            //                     }, {
-            //                         headers: {
-            //                             'Content-Type' : 'application/json',
-            //                             'Authorization': 'Bearer ' + localStorage.getItem('token')
-            //                         }
-            //                     }).then(() => {
-            //                         this.updateLikeCounter();
-            //                     }).catch((error) => {
-            //                         const msgerror = error.res.data
-            //                         this.notyf.error(msgerror.error)
-            //                     })
-            //                 }
-            //             }
-            //         }).catch((error) => {
-            //             const msgerror = error.res.data
-            //             this.notyf.error(msgerror.error)
-            //         })
-
-            // },
-            // updateLikeCounter(){
-            //     const messageId = this.post.id
-            //         axios.get('http://localhost:3000/api/users/messages/' + messageId, {
-            //             headers: {
-            //                 'Content-Type' : 'application/json',
-            //                 'Authorization': 'Bearer ' + localStorage.getItem('token')
-            //             }
-            //         }).then((res) => {
-            //             const likeCounter = res.data.messageFound
-            //             const refreshLikes = document.getElementById(this.post.id)
-            //             console.log(refreshLikes);
-            //             refreshLikes.innerHTML = likeCounter.likes
-            //         }).catch((error) => {
-            //             const msgerror = error.res.data
-            //             this.notyf.error(msgerror.error)
-            //         })
-            // }
         }
     }
 </script>
@@ -167,7 +119,10 @@
                     position: absolute;
                     right: 20px;
                     display: flex;
+                    align-items: flex-start;
+                    font-size: 20px;
                     .heart_action{
+                        outline: none;
                         border: none;
                         background: none;
                         position: relative;
@@ -180,7 +135,10 @@
                             position: absolute;
                         }
                     }
-                    .heart_action:focus{
+                    p{
+                        margin-left: 10px;
+                    }
+                    .display_heart_color{
                         outline: none;
                         .full_heart, .empty_heart{
                             transition: all 1s ease-out;

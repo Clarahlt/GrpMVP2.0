@@ -1,7 +1,5 @@
 <template>
-	<div class="newPost__photo">
 		<img :src="src || 'user-circle-solid.svg'" class="image" alt="Photo de profil"/>
-	</div>
 </template>
 
 

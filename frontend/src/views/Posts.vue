@@ -35,9 +35,9 @@
                         <div :contentPostId="post.id" class="card-post col-md-6">
                             <div class="card modele-post ">
                                 <div class="card-title" >
-                                    <ProfileImage :src="imageProfile" class="icon-user-post"/>
+                                    <ProfileImage :src="post.User.imageProfile" class="icon-user-post"/>
                                     <div class="title">
-                                        <h5 class="username-post">{{ username }}</h5>
+                                        <h5 class="username-post">{{ post.User.username }}</h5>
                                         <h6 class="text-muted">{{ post.title }}</h6>
                                     </div>
                                     <div class="dropdown">
@@ -82,7 +82,6 @@ import Likes from '../components/Likes.vue'
         data(){
             return {
                 userId: localStorage.getItem('userId'),
-                username: localStorage.getItem('username'),
                 isAdmin: localStorage.getItem('isAdmin'),
                 imageProfile: localStorage.getItem('imageProfile'),
                 posts: [],
@@ -117,7 +116,8 @@ import Likes from '../components/Likes.vue'
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                 })
-                .then(() => {
+                .then((res) => {
+                    console.log(res.data);
                     window.location.reload()
                 })
                 .catch(error => {
@@ -130,6 +130,8 @@ import Likes from '../components/Likes.vue'
 
             // Permet d'afficher tous les messages
             displayPost() {
+                const post = this.post
+                console.log(post);
                 axios.get('http://localhost:3000/api/users/messages', {
                     headers: {
                         'Content-Type' : 'application/json',
@@ -139,7 +141,6 @@ import Likes from '../components/Likes.vue'
                 .then(response => {
                     this.posts = response.data;
                     console.log(this.posts)
-    
                 })
                 .catch(error => {
                     const msgerror = error.response.data
@@ -153,8 +154,7 @@ import Likes from '../components/Likes.vue'
                 }
             },
             deletePost(id){
-                const messageId = id;
-               
+                const messageId = id;               
                 axios.delete('http://localhost:3000/api/users/messages/' + messageId, {
                     headers: {
                         'Content-Type' : 'application/json',
@@ -263,6 +263,9 @@ import Likes from '../components/Likes.vue'
             }
             .card-footer{
                 display: flex;
+                p{
+                    margin: 0;
+                }
                 .post-likes{
                     position: absolute;
                     right: 20px;

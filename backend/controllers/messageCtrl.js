@@ -50,18 +50,20 @@ exports.listPost = (req, res, next) => {
         attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
         limit: (!isNaN(limit)) ? limit : null,
         offset: (!isNaN(offset)) ? offset : null,
-        includes: [{
+        include: [{
             model: models.User,
-            attributes: ['username']
+            as : "User",
+            attributes: ['username', 'imageProfile'],
+            
         }]
     })
     .then(function(messages){
         if(messages) {
-            res.status(200).json(messages)
-        } else {
-            res.status(404).json({"error" : "no messages found"});
-        }
-    })
+           res.status(200).json(messages)
+         } else {
+             res.status(404).json({"error" : "no messages found"});
+         } 
+     })
     .catch(function(err){
         console.log(err)
         res.status(500).json({"error": "invalid fields"})
@@ -72,19 +74,72 @@ exports.deletePost = (req,res) => {
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
     
-    id = req.body.id
-    console.log(id);
+    messageId = req.params.messageId
+    console.log(messageId);
 
     models.Message.findOne({
-        attributes: ['id', 'userId'],
         where: {
-            messageId: id,
+            id: messageId,
             userId : userId
         }
-    }).then(() => {
-        return res.status(200).json({"message": "Votre message a bien été supprimé"})
-    }).catch((err) => {
-        console.log(err)
-        res.status(500).json({"error": "invalid fields"})
     })
+    .then(function(messageFound){
+        if(messageFound){
+            models.Like.findAll({
+                where:{
+                   messageId : messageId,
+                }
+            })
+            .then(function(likeFound){
+                if(likeFound){
+                    console.log(likeFound);
+                    models.Like.destroy({
+                        where:{
+                            messageId : messageId,  
+                    }
+                    }).then((LikeDeleted)=>{
+                        if(LikeDeleted){
+                            models.Message.destroy({
+                                where: {
+                                    id : messageId,
+                                    userId : userId
+                                }
+                            }).then((messageDeleted) => {
+                                return res.status(200).json({"message" : "Message deleted with success", messageDeleted})
+                            }).catch((err) => {
+                                return res.status(400).json({"error" : "Message not deleted"})
+                            })
+                        } else {
+                            if(messageFound){
+                                models.Message.destroy({
+                                    where: {
+                                        id : messageId,
+                                        userId : userId
+                                    }
+                                }).then((messageDeleted) => {
+                                    return res.status(200).json({"message" : "Message deleted with success", messageDeleted})
+                                }).catch((err) => {
+                                    return res.status(400).json({"error" : "Message not deleted"})
+                                })
+                            } else { 
+                                res.status(404).json({"error" : "message not found"})
+                            }
+                        }
+                    }).catch((err)=>{
+                        return res.status(500).json({"error" : "impossible to deleted the likes found"})
+                    })               
+                } else {
+                    res.status(404).json({"error" : "Likes not found"})
+                }
+            }).catch(() => {
+                res.status(500).json({"error" : "cannot find like"})
+            })
+        }
+    })
+    .catch(()=> {
+        return res.status(500).json({"error" : "Cannot find this message"})
+    })
+
+
+
 }

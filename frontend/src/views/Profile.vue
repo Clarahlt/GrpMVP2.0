@@ -8,8 +8,8 @@
             <div class="row background-profile">
                 <div class="col-md-4 img-content">
                     <div class="img-profile">
-                         <button button @click="uploadFile" type="button" class="btn"><ProfileImage :src="user.imageProfile" class="profile__photo__image"/></button>
-                        <input type="file" ref="fileUpload" name="imageProfile" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+                        <input type="file" ref="uploadFile" name="imageProfile" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+                        <label for="file-input"><ProfileImage :src="user.imageProfile" class="profile__photo__image"/></label>
                     </div>
                 </div>
                 <div class="col-md-8 navbar-profile">
@@ -99,17 +99,20 @@ import ProfileImage from '../components/ProfileImage.vue'
                 this.revele = !this.revele
             },
             onFileSelected(event) {
-				this.$refs.fileUpload.click()
+                this.$refs.uploadFile.click()
 				this.imageProfile = event.target.files[0]
-                console.log(this.imageProfile)
+                if(this.imageProfile === null){
+                    console.log("cant null");
+                } else {
+                    console.log(this.imageProfile);
+                    this.uploadFile();
+                    
+                }
 			},
             uploadFile(){
                 const userId = localStorage.getItem('userId')
                 const formData = new FormData();
                 formData.append("imageProfile", this.imageProfile)
-                if(this.imageProfile === null){
-					this.notyf.error("La photo ne peut contenir null")
-                } else {
                     axios.put('http://localhost:3000/api/users/profile/' + userId, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -119,18 +122,14 @@ import ProfileImage from '../components/ProfileImage.vue'
                 .then((res) => {
                     const userImg = res.data.userFound.imageProfile
                     localStorage.setItem("imageProfile", userImg)
-                    document.getElementById('')
-                    window.location.reload();
+                    console.log(res.data);
+                    window.location.reload()
                 }).catch(error => {
 					const msgerror = error.res.data
 					this.notyf.error(msgerror.error)
 				})
-                }
+                
             },
-            
-
-
-
         
         }
     }
@@ -143,7 +142,6 @@ import ProfileImage from '../components/ProfileImage.vue'
     }
 }
 .profile-infos{
-    background: white;
     border-radius: 15px;
     width: 90%;
     margin: auto;
@@ -161,14 +159,25 @@ import ProfileImage from '../components/ProfileImage.vue'
                 display: inline-flex;
                 border: 2px solid white;
                 border-radius: 50%;
-                .btn-img-profile{
-                    width: 100%;
-                    border-radius: 50%;
-                    font-size: 60px;
-                    color: dimgray;
+                overflow: hidden;
+                .image{
+                    width: 300px;
+                    height: 200px;
+                    border-radius: 100%;
+                    position: relative;
+                    right: 21%;
+                    top: -2%;
+                }
+                input{
+                    display: none;
                 }
             }
         }
+    }
+    .profile-content{
+        background: white;
+        position: relative;
+        top: -10px;
     }
     .navbar-profile{
         .nav{
