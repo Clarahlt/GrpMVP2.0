@@ -8,6 +8,7 @@
             
 
             </aside>
+            <!-- Bloc de création de post -->
             <div class="col-md-6 txtarea-post">
                 <div class="row post">
                     <ProfileImage :src="imageProfile" class="icon-img-profile"/>
@@ -17,18 +18,22 @@
                     </div>
                 </div>
                 <div class="row post-tools">
-                    <button class="col-md-3 col-3 btn" type="button" name="photo"><i class="bi bi-image"></i> Photo</button>
+                    <!-- <button @click="uploadFile" type="button" for="input" class="newPost__option__file__btnInvisible"><i class="bi bi-image"></i></button> -->
+                    <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+    
                     <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> Vidéo</button>
-                    <button class="col-md-6 col-6 btn btn-secondary btn-sm btn-submit" v-on:click="createPost">Publier</button>
+                    <button type="submit" @click="createPost" class="col-md-6 col-6 btn btn-secondary btn-sm btn-submit">Publier</button>
                 </div>
             </div>
+
+
             <aside class="col-md-3 aside-agenda">
                 <div class="agenda">
                     <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
                 </div>
             </aside>
 
-
+            <!-- Bloc affichant les posts -->
             <div class="displayPost" v-for="post in posts" :key="post.id">
                 <div class="displayPost__item">
                     <div class="row display-content-post">
@@ -49,6 +54,11 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div class="img-post">
+                                    <img v-show="!post.attachment">
+                                    <img :src="post.attachment" alt="">
+                                </div>
+                                
                                 <p class="card-text">{{ post.content }}</p>
                                 <div class="card-footer text-muted">
                                     <p class="post-date">Publié le {{ dateFormat(post.createdAt) }}</p>
@@ -85,10 +95,11 @@ import Likes from '../components/Likes.vue'
                 isAdmin: localStorage.getItem('isAdmin'),
                 imageProfile: localStorage.getItem('imageProfile'),
                 posts: [],
-                title: "",
-                content: "",
-                attachment: "vide pour le moment",
-                likes: "",
+                title: '',
+                content: '',
+                attachment: '',
+                file: '',
+                likes: 0,
             }
         },
         created(){
@@ -102,17 +113,22 @@ import Likes from '../components/Likes.vue'
             });
         },
         methods: {
+            onFileSelected(event){
+                this.$refs.uploadFile.click()
+                
+                this.attachment = event.target.files[0]
+                console.log(this.attachment);
+            },
             // Permet de créer un post
             createPost() {
-                const postForm = {
-                    title: this.title,
-                    content: this.content, 
-                    attachment: this.attachment,
-                    username: this.username,
-                }
-                axios.post('http://localhost:3000/api/users/messages/create', postForm, {
+                const formData = new FormData()
+                formData.append('image' , this.attachment)
+                formData.append('title', this.title)
+                formData.append('content', this.content)
+                formData.append('likes', this.likes)
+                axios.post('http://localhost:3000/api/users/messages/create', formData,{
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                 })
@@ -122,16 +138,13 @@ import Likes from '../components/Likes.vue'
                 })
                 .catch(error => {
                     const msgerror = error.response.data;
-                    this.notyf.error(msgerror.error)
-                    
+                    this.notyf.error(msgerror.error)    
                 })
 
             },
 
             // Permet d'afficher tous les messages
             displayPost() {
-                const post = this.post
-                console.log(post);
                 axios.get('http://localhost:3000/api/users/messages', {
                     headers: {
                         'Content-Type' : 'application/json',
@@ -259,6 +272,11 @@ import Likes from '../components/Likes.vue'
                     position: absolute;
                     right: 0px;
                     margin: 5px;
+                }
+            }
+            .img-post{
+                img{
+                    width: 90%,
                 }
             }
             .card-footer{

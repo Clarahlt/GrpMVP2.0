@@ -1,12 +1,12 @@
 <template> 
-    <div v-if="revele" v-on:click="displayModify" class="modaleBloc">
+    <div v-if="revele" @click="displayModify" class="modaleBloc">
         <div class="modaleBloc__overlay"></div>
         
         <div class="modaleBloc__card">
             <div class="modaleBloc__card__title">
                 <h2>Informations personnelles</h2>
 
-                <div v-on:click="displayModify" class="modaleBloc__card__title__close">
+                <div @click="displayModify" class="modaleBloc__card__title__close">
                     <i class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
                 </div>
                 <form class="modify-form">
@@ -22,7 +22,7 @@
 
                     <div class="form-input row">
                         <label for="username" class="form-username col-md-4">Username</label>
-                        <input class="col-md-8" type="text" id="username" name="username" v-model="username" placeholder="username">
+                        <input class="col-md-8" id="username" name="username" v-model="username" placeholder="username">
                     </div>
 
                     <div class="form-input row">
@@ -55,7 +55,6 @@
 
                     
                 </form>
-
             </div>
         </div>
     </div>

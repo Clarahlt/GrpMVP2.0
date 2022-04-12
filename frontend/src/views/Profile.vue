@@ -8,7 +8,7 @@
             <div class="row background-profile">
                 <div class="col-md-4 img-content">
                     <div class="img-profile">
-                        <input type="file" ref="uploadFile" name="imageProfile" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+                        <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
                         <label for="file-input"><ProfileImage :src="user.imageProfile" class="profile__photo__image"/></label>
                     </div>
                 </div>
@@ -112,7 +112,7 @@ import ProfileImage from '../components/ProfileImage.vue'
             uploadFile(){
                 const userId = localStorage.getItem('userId')
                 const formData = new FormData();
-                formData.append("imageProfile", this.imageProfile)
+                formData.append("image", this.imageProfile)
                     axios.put('http://localhost:3000/api/users/profile/' + userId, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',

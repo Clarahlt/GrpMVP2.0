@@ -9,7 +9,6 @@ exports.createPost = (req, res, next) => {
 
     title = req.body.title
     content = req.body.content
-    attachment = req.body.attachment
 
     if(title == "" || content == "") {
         return res.status(400).json({"error": "Tous les champs doivent être remplis"})
@@ -22,11 +21,11 @@ exports.createPost = (req, res, next) => {
     .then(function(userFound){
         if(userFound){
             models.Message.create({
-                title: req.body.title,
-                content: req.body.content,
-                attachment: req.body.attachment,
+                title: title,
+                content: content,
+                attachment: req.file ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}`: req.body.image,
                 likes: 0,
-                userId: userFound.id
+                userId: userId
             })
             .then(function(newPost){
                 return res.status(201).json({"message" : "Votre message est en ligne :) !"})

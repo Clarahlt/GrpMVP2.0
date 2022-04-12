@@ -14,7 +14,7 @@ router.get('/profile/:id', userCtrl.profile);
 router.put('/profile/:id', multer, userCtrl.updateProfile);
 router.delete('/profile/:id', userCtrl.deleteAccount);
 
-router.post('/messages/create', messageCtrl.createPost);
+router.post('/messages/create', multer, messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);
 
 router.get('/messages/:messageId', likesCtrl.getLikes)
