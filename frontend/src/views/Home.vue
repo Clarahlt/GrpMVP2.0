@@ -46,6 +46,12 @@ export default {
 <style scoped lang="scss">
 .bloc-logo-groupomania {
   height: 400px;
+  @media (max-width: 776px) {
+    height: 220px;
+    img{
+      width:95%
+    }
+  }
 }
 .btn-connect {
   font-weight: bold;

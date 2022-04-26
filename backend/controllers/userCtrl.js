@@ -89,6 +89,7 @@ exports.login = (req, res) => {
                     firstname: userFound.firstname,
                     bio: userFound.bio,
                     isAdmin: userFound.isAdmin,
+                    imageProfile: userFound.imageProfile,
                     token : auth.generateRandomToken(userFound)
 
                 }) } else {
@@ -117,7 +118,7 @@ exports.profile = (req, res) => {
     }
 
     models.User.findOne({
-    attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio', 'imageProfile'],
+    attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio', 'imageProfile', 'isAdmin'],
     where: { id : userId }
      })
     .then(function(user){

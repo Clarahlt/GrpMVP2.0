@@ -2,23 +2,25 @@
     <div id="app">
         <Navbar/>
 
-        <div class="row display-post">
+        <div class="container">
 
-            <aside class="col-md-3 profile-box">
+            <div class="row display-post">
+
+            <aside class="col- col-xl-3 profile-box">
             
 
             </aside>
             <!-- Bloc de création de post -->
-            <div class="col-md-6 txtarea-post">
+            <div class="col-sm-10 col-lg-8 col-xl-6  txtarea-post">
                 <div class="row post">
                     <ProfileImage :src="imageProfile" class="icon-img-profile"/>
-                    <div class="col-md-8">  
-                    <input v-model="title" class="title-post" type="title" id="title" name="title" placeholder="Votre titre">
-                    <input v-model="content" class="content-post" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?...">
+                    <div class="col">  
+                    <input v-model="title" class="form-text title-post" type="title" id="title" name="title" placeholder="Votre titre">
+                    <input v-model="content" class="form-text content-post" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?...">
                     </div>
                 </div>
                 <div class="row post-tools">
-                    <!-- <button @click="uploadFile" type="button" for="input" class="newPost__option__file__btnInvisible"><i class="bi bi-image"></i></button> -->
+                    <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i> image</button> 
                     <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
     
                     <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> Vidéo</button>
@@ -27,7 +29,7 @@
             </div>
 
 
-            <aside class="col-md-3 aside-agenda">
+            <aside class="col- col-xl-3 aside-agenda">
                 <div class="agenda">
                     <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
                 </div>
@@ -37,15 +39,17 @@
             <div class="displayPost" v-for="post in posts" :key="post.id">
                 <div class="displayPost__item">
                     <div class="row display-content-post">
-                        <div :contentPostId="post.id" class="card-post col-md-6">
+                        <div :contentPostId="post.id" class="col-sm-10 col-lg-8 col-xl-6 card-post">
                             <div class="card modele-post ">
                                 <div class="card-title" >
-                                    <ProfileImage :src="post.User.imageProfile" class="icon-user-post"/>
+                                    <div v-if="!post.User.imageProfile" class="icon-user-post"><i class="bi bi-person-circle"></i></div>
+                                    <div v-else-if="post.User.imageProfile"><ProfileImage :src="post.User.imageProfile" class="icon-user-post"/></div>
+                                    
                                     <div class="title">
                                         <h5 class="username-post">{{ post.User.username }}</h5>
                                         <h6 class="text-muted">{{ post.title }}</h6>
                                     </div>
-                                    <div class="dropdown">
+                                    <div v-if="post.userId == this.userId" class="dropdown">
                                         <button type="button" class="btn" data-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="#">Modifier</a>
@@ -53,10 +57,12 @@
                                             <a :messageId="post.id" @click="deletePost(post.id)" class="dropdown-item" href="#">Supprimer</a> 
                                         </div>
                                     </div>
+                                    <div v-else-if="post.userId !== this.userId"></div>
                                 </div>
-                                <div class="img-post">
-                                    <img v-show="!post.attachment">
-                                    <img :src="post.attachment" alt="">
+                                <div v-if="!post.attachment" class="img-post">
+                                </div>
+                                <div v-else-if="post.attachment" class="img-post">
+                                    <img :src="post.attachment" alt="image du message">
                                 </div>
                                 
                                 <p class="card-text">{{ post.content }}</p>
@@ -68,6 +74,7 @@
                         </div>                
                     </div>
                 </div>
+            </div>
             </div>
         </div>  
     </div>
@@ -114,10 +121,12 @@ import Likes from '../components/Likes.vue'
         },
         methods: {
             onFileSelected(event){
-                this.$refs.uploadFile.click()
                 
                 this.attachment = event.target.files[0]
                 console.log(this.attachment);
+            },
+            uploadFile(){
+                this.$refs.uploadFile.click()
             },
             // Permet de créer un post
             createPost() {
@@ -188,8 +197,17 @@ import Likes from '../components/Likes.vue'
 </script>
 
 <style lang="scss" scoped>
+.container{
+    @media (max-width: 776px){
+      padding-top: 100px;
+    }
+}
 
 .display-post{
+    @media (max-width: 776px) {
+        width: 95%;
+        margin: auto;
+    }
     .txtarea-post{
         height: fit-content;
         background: #F7F7F7;
@@ -201,15 +219,18 @@ import Likes from '../components/Likes.vue'
             margin: auto;
             .icon-img-profile{
                 background-size: cover;
-                width: 80px;
-                height: 70px;
+                width: 90px;
+                height: 65px;
                 background-position: center;
                 margin: 0 20px;
+                @media (max-width: 775px) {
+                    display: none;
+                }
             }
             input{
                 margin: 2px 0;
                 padding: 10px;
-                width: 120%;
+                width: 100%;
                 border: lightblue 2px solid;
                 border-radius: 5px;
             }
@@ -224,6 +245,11 @@ import Likes from '../components/Likes.vue'
     .post-tools{
         justify-content: right;
         margin: 5px 30px 5px 0;
+        @media (max-width: 776px) {
+            justify-content: center;
+            margin: 5px auto;
+            
+        }
         .btn{
             color: #4A4A48;
             font-weight: bold;
@@ -235,15 +261,24 @@ import Likes from '../components/Likes.vue'
                 color: #ff6363;
             }
         }
+        input{
+            display:none;
+        }
         .btn-submit{
                 width: 15%;
+                @media (max-width: 776px){
+                    width: 25%;
+                }
             }
     }
     .aside-agenda{
         padding: 10px;
-        .agenda{
-                padding: 9px;
+        @media (max-width: 775px) {
+            display: none;        
             }
+        .agenda{
+            padding: 9px;
+        }
     }
 }
 .display-content-post{
@@ -253,6 +288,9 @@ import Likes from '../components/Likes.vue'
         top: -120px;
         padding: 20px 0px;
         border-top: 1px lightgrey solid;
+        @media(max-width: 776px){
+            top: 0;
+        }
         .modele-post{
             margin: auto;
             .card-title{
@@ -262,7 +300,12 @@ import Likes from '../components/Likes.vue'
                     width: 70px;
                     height: 60px;
                     background-position: center;
-                    margin: 5px 0px 0px 40px;
+                    margin: 5px 0px 0px 25px;
+                    i{
+                        font-size: 60px;
+                        position: relative;
+                        bottom: 12px;
+                    }
                 }
                 .title{
                     text-align: left;
@@ -276,8 +319,13 @@ import Likes from '../components/Likes.vue'
             }
             .img-post{
                 img{
-                    width: 90%,
+                    width: 90%;
+                    border-radius: 15px;
                 }
+            }
+            p{
+                margin: 15px 35px 15px 35px;
+                text-align: left;
             }
             .card-footer{
                 display: flex;

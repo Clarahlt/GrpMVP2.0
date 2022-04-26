@@ -96,6 +96,12 @@ export default {
 <style scoped lang="scss">
 .bloc-logo-groupomania{
   height: 400px;
+  @media (max-width: 776px) {
+    height: 220px;
+    img{
+      width:95%
+    }
+  }
 }
 .signup-form{
   border: 3px solid #3f3d56;
@@ -103,6 +109,10 @@ export default {
   background: linear-gradient(0deg, #24586d, transparent);
   width: 35%;
   margin: auto;
+  @media (max-width: 776px) {
+    width: 90%;
+    margin-bottom: 10px;
+  }
   h1{
     margin: 25px auto;
   }

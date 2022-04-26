@@ -61,6 +61,7 @@ export default {
                     localStorage.setItem('lastname', response.data.lastname);
                     localStorage.setItem('firstname', response.data.firstname);
                     localStorage.setItem('isAdmin', response.data.isAdmin);
+                    localStorage.setItem('imageProfile', response.data.imageProfile)
                     this.notyf.success('Ravie de vous revoir')
                     this.$router.push('/Posts');
                 })
@@ -92,6 +93,10 @@ export default {
   background: linear-gradient(0deg, #24586d, transparent);
   width: 35%;
   margin: auto;
+  @media (max-width: 776px) {
+    width: 90%;
+  }
+
   h1{
     margin:25px auto;
   }

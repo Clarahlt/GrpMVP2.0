@@ -1,5 +1,5 @@
 <template>
-    <button @click="logout" class="nav__links__logoutLink">Déconnexion <i class="bi bi-door-closed"></i></button>    
+    <button @click="logout" class="nav__links__logoutLink"><p>Déconnexion</p> <i class="bi bi-door-closed"></i></button>    
 </template>
 
 <script>
@@ -20,5 +20,12 @@ export default {
 </script>
 
 <style lang='scss'>
+button{
+    p{
+        @media (max-width: 776px){
+            display: none;
+        }
+    }
+}
 
 </style>
