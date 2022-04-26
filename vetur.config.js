@@ -16,19 +16,19 @@ module.exports = {
         // **required**
         // Where is your project?
         // It is relative to `vetur.config.js`.
-        root: './packages/repo1',
+        root: './',
         // **optional** default: `'package.json'`
         // Where is `package.json` in the project?
         // We use it to determine the version of vue.
         // It is relative to root property.
-        package: './package.json',
+        package: 'frontend/package.json',
         // **optional**
         // Where is TypeScript config file in the project?
         // It is relative to root property.
-        tsconfig: './tsconfig.json',
+        tsconfig: 'frontend/tsconfig.json',
         // **optional** default: `'./.vscode/vetur/snippets'`
         // Where is vetur custom snippets folders?
-        snippetFolder: './.vscode/vetur/snippets',
+        snippetFolder: '.vscode/vetur/snippets',
         // **optional** default: `[]`
         // Register globally Vue component glob.
         // If you set it, you can get completion by that components.
