@@ -1,4 +1,5 @@
 <template> 
+    <!-- bloc de suppression de compte -->
     <div v-if="display" class="modaleBloc">
         <div @click="displayDeleteBloc" class="modaleBloc__overlay"></div>
         
@@ -18,6 +19,7 @@
 
 
 <script>
+//imports
     import axios from 'axios'
     import { Notyf } from 'notyf'
     import 'notyf/notyf.min.css'
@@ -36,7 +38,7 @@
             });
         },
         methods: {
-            // Permet de supprimer le compte
+            // Permet de supprimer le compte et de basculer sur la page d'accueil
             deleteAccount(){
                 const userId = localStorage.getItem('userId');
 

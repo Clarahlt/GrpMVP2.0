@@ -1,5 +1,9 @@
+//Importe jsonwebtoken
 const jwt = require('jsonwebtoken');
 
+//Permet de générer un token (gererateRandomToken), 
+//de parser l'en-tête "authorization" (parseAuthorization)
+//et de  vérifier le token envoyé par le frontend (verifyToken)
 module.exports = {
       generateRandomToken: function(userData){
         return jwt.sign(

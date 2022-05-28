@@ -28,7 +28,7 @@
                 </div>
             </div>
 
-
+            <!-- Aside agenda Google-->
             <aside class="col- col-xl-3 aside-agenda">
                 <div class="agenda">
                     <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
@@ -175,6 +175,7 @@ import Likes from '../components/Likes.vue'
                     return moment(String(date)).format('DD/MM/YYYY')
                 }
             },
+            //Permet de supprimer un post
             deletePost(id){
                 const messageId = id;               
                 axios.delete('http://localhost:3000/api/users/messages/' + messageId, {

@@ -1,8 +1,12 @@
+//Importe le modele message
 const models = require('../models');
+
+//Permet d'accéder au middleware d'authentification
 const auth = require('../middlewares/auth')
 
-
+//Permet de poster un message
 exports.createPost = (req, res, next) => {
+    //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
@@ -10,6 +14,7 @@ exports.createPost = (req, res, next) => {
     title = req.body.title
     content = req.body.content
 
+    //Vérifie si tous les champs sont complétés
     if(title == "" || content == "") {
         return res.status(400).json({"error": "Tous les champs doivent être remplis"})
     }
@@ -38,12 +43,15 @@ exports.createPost = (req, res, next) => {
     });
 },
 
+//Permet de récupérer et d'afficher la liste des messages
 exports.listPost = (req, res, next) => {
-    fields = req.query.fields
-    limit = parseInt(req.query.limit)
-    offset = parseInt(req.query.offset)
-    order = req.query.order
+    fields = req.query.fields // permet de récupérer les colonnes qu'on souhaite afficher
+    limit = parseInt(req.query.limit) 
+    offset = parseInt(req.query.offset) // limit et offset permettent de récupérer les messages par segmentation afin d'avoir les messages un à un avec un systeme de page
+    order = req.query.order // permet de sortir la liste des messages via un order particulier
 
+    // cette méthode prend en tant que premier params tous les attributs de notre requête en s'assurant que l'utilisateur entre des données corrects
+    // ne peuvent pas être NULL, et autres restrictions
     models.Message.findAll({
         order: [(order != null) ? order.split(':') : ['createdAt', 'DESC']],
         attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
@@ -68,7 +76,10 @@ exports.listPost = (req, res, next) => {
         res.status(500).json({"error": "invalid fields"})
     })
 },
+
+//Permet de supprimer un message
 exports.deletePost = (req,res) => {
+    //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});

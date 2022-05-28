@@ -1,10 +1,14 @@
+//Importe le modele like
 const models = require('../models');
 const auth = require('../middlewares/auth');
+
+//Imports
 const asyncLib = require('async');
 
 const DISLIKED = 0;
 const LIKED = 1;
 
+//Permet d'obtenir et d'afficher le nombre de likes ou dislikes
 exports.getLikes = (req, res, next) => {
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
@@ -36,7 +40,9 @@ exports.getLikes = (req, res, next) => {
 
 },
 
+//Permet de liker un message
 exports.like = (req, res, next) => {
+    //Vérifie le token 
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
@@ -122,7 +128,9 @@ exports.like = (req, res, next) => {
     });
 },
 
+//Permet de disliker un message
 exports.dislike = (req, res) => {
+    //Vérifie le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1];
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});

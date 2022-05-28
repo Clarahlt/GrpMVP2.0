@@ -1,7 +1,8 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+//Importe Sequelize
+const { Model } = require('sequelize');
+
+
 module.exports = (sequelize, DataTypes) => {
   class Like extends Model {
     /**

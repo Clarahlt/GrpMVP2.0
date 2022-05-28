@@ -7,21 +7,16 @@
         alt="logo de l'entreprise groupomania"
       />
     </div>
+    <!-- Affiche le bloc de connexion -->
     <div class="connection">
-      <button
-        v-if@click="disappear"
-        class="btn btn-connect"
-        @click="connectForm"
-      >
-        Se connecter
-      </button>
+      <button v-if@click="disappear" class="btn btn-connect" @click="connectForm"> Se connecter </button>
       <User v-if@click="revele" />
     </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
+//Imports
 import User from "@/components/User.vue";
 
 export default {
@@ -36,6 +31,7 @@ export default {
     };
   },
   methods: {
+    //Permet d'afficher le bloc de connexion
     connectForm() {
       (this.revele = true), (this.disappear = false);
     },

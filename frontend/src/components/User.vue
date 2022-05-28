@@ -1,6 +1,7 @@
 <template>
   <div class="user">
     <div class="login">
+      <!-- Formulaire de connexion -->
       <form @submit.prevent="login" class="login-form">
         <h1>Se connecter</h1>
 
@@ -16,6 +17,7 @@
 
         <button class="btn btn-form" v-on:click="login()">Connexion</button>
 
+        <!-- Lien de redirection vers la page d'inscription -->
         <p>Vous n'avez pas encore de compte?<router-link to="/signup" class="signup-form">S'inscrire</router-link></p>
       
       </form>
@@ -25,6 +27,7 @@
 </template>
 
 <script>
+//Imports
 import axios from 'axios'
 import { Notyf } from 'notyf'
 import 'notyf/notyf.min.css'
@@ -48,6 +51,8 @@ export default {
         },
   methods: {
     login() {
+        //Permet de se connecter, de récupérer les informations de l'utilisateur
+        //Et de basculer sur la page affichant les posts
         axios.post('http://localhost:3000/api/users/login', {
                     email: this.email,
                     password: this.password,

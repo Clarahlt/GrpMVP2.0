@@ -4,6 +4,8 @@
         <div class="container welcom">
             <h1 v-if="user" class="title">Bienvenue {{ user.username }} !</h1>
         </div>
+
+        <!-- Affiche les informations du profil-->
         <div class ="container profile-infos">
             <div class="row background-profile">
                 <div class="col-md-4 img-content">
@@ -24,7 +26,7 @@
                     </nav>
                 </div>
 
-
+                <!-- Bloc permettant de modifier le profil -->
                 <div class="bloc" v-show="revele">
                     <div class="overlay"></div>
                     <div class="bloc-form">
@@ -66,7 +68,8 @@
                                 </div>
 
                                 <button v-on:click="updateProfile" class="btn form-btn">Enregistrer</button>
-
+                                
+                                <!-- Permet d'accéder au bloc de suppression de compte -->
                                 <div class="delete-account row">
                                     <button v-on:click="deleteProfile" class="btn display btn-danger">
                                     <DeleteAccount v-bind:display="display" v-bind:displayDeleteBloc="displayDeleteBloc" id="displayDeleteBloc" />
@@ -83,6 +86,7 @@
 
 
             </div>
+            <!-- informations du profil -->
             <div class="row profile-content">
                 <div class="col-md-6 profile-cart">
                     <p class="name">{{ user.lastname}} {{user.firstname}}</p>
@@ -98,10 +102,12 @@
 </template>
 
 <script>
+//Imports
 import axios from 'axios'
 import { Notyf } from 'notyf'
 import 'notyf/notyf.min.css'
 
+//Importe les composants
 import Navbar from '../components/Navbar.vue'
 import ProfileImage from '../components/ProfileImage.vue'
 import DeleteAccount from '../components/DeleteAccount.vue'
@@ -138,6 +144,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
             });
 		},
         methods: {
+            //Permet d'afficher les informations du profil
             displayProfile() {
                 const userId = localStorage.getItem('userId');
 
@@ -157,6 +164,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
 				})
 
 			},
+            //Affiche le bloc permettant à l'utilisateur de modifier ses informations
             displayModify(){
                 this.revele = !this.revele
             },
@@ -171,6 +179,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                     
                 }
 			},
+            //Permet d'ajouter ou modifier l'image du profil directement sur la fiche profil
             uploadImgProfile(){
                 const userId = localStorage.getItem('userId')
                 const imgData = new FormData();
@@ -198,6 +207,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
             uploadFormFile(){
                 this.refs.uploadFormFile.click();
             },
+            //Permet à l'utilisateur de modifier ses informations
             updateProfile(){
                 const userId = localStorage.getItem('userId')
                 const formData = new FormData();
@@ -229,6 +239,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                 })
                 }
             },
+            //Permet à l'utilisateur d'afficher le bloc de suppression de compte
             deleteProfile(){
                 this.display = !this.display
             }

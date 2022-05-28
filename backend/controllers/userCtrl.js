@@ -1,10 +1,15 @@
+//imports
 const bcrypt = require('bcrypt');
+//importe le middleware d'authentification
 const auth = require('../middlewares/auth');
+//Importe le modèle utilisateur
 const models = require('../models');
+
 // Regex de validation
  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 // const passwordRegex = /^((?=.*[a-z])+(?=.*[A-Z])+(?=.*[0-9])+(?=.*[!@#\$%\^&\*])).{8,20}$/;
 
+//Permet de créer un nouvel utilisateur 
 exports.signup = (req, res, next) => {
     email = req.body.email
     username = req.body.username
@@ -12,6 +17,7 @@ exports.signup = (req, res, next) => {
     firstname = req.body.firstname
     password = req.body.email
 
+    //Permet de vérifier que tous les champs sont complétés
     if(email == "" || username == "" || lastname == "" || firstname == "" || password == "") {
         return res.status(400).json({ "error" : "Tous les champs doivent être remplis !"})
     } 
@@ -25,14 +31,16 @@ exports.signup = (req, res, next) => {
     //     return res.status(400).json({"error": "Le mot de passe doit contenir au moins un caractère spécial, une lettre majuscule, une lettre minuscule, et un chiffre - et doit être compris entre 7-20 caractères"})
     // }
 
-
+    //Permet de vérifier que l'utilisateur existe dans la base de données
     models.User.findOne({
         attributes: ['email'],
         where: { email : email}
     })
     .then(function(userFound){
+        //Si l'utilisateur n'est pas trouvé dans la BD
         if(!userFound) {
 
+            //un nouvel utilisateur est créé et son mot de passe est salé avant d'être stocké
             bcrypt.genSalt(5, function(err, salt){
                 bcrypt.hash(req.body.password, salt, function(error, bcryptedPassword){
                     const newUser = models.User.create({
@@ -64,21 +72,27 @@ exports.signup = (req, res, next) => {
     })
 },
 
-
+//Permet de se connecter à l'application 
 exports.login = (req, res) => {
     email = req.body.email
     password = req.body.password
 
+
+    //Permet de vérifier que tous les champs sont complétés
     if(email == "" || password == ""){
         return res.status(400).json({"error": "Tous les champs doivent être remplis"})
     }
+
+    //Permet de vérifier si l'utilisateur existe dans la BD
     models.User.findOne({
         where: { email : email }
     })
     .then(function(userFound){
-
+        //Si l'utilisateur est trouvé
         if(userFound){
+            //bcrypt compare le mdp entré en clair avec le mot de passe salé de la BD
             bcrypt.compare(password, userFound.password, function(err, results){
+                //Si le mdp est valide, l'utilisateur accède à ses données et obtient un token
                 if(results){
                 return res.status(200).json({
                     results : results,
@@ -90,7 +104,7 @@ exports.login = (req, res) => {
                     bio: userFound.bio,
                     isAdmin: userFound.isAdmin,
                     imageProfile: userFound.imageProfile,
-                    token : auth.generateRandomToken(userFound)
+                    token : auth.generateRandomToken(userFound) //importe le middleware d'authentification
 
                 }) } else {
                     return res.status(404).json({
@@ -108,7 +122,9 @@ exports.login = (req, res) => {
     .catch(err => res.status(500).json({"error": "impossible de vérifier l'utilisateur"}))
 },
 
+//Permet à un utilisateur d'accéder à son profil
 exports.profile = (req, res) => {
+    //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
@@ -117,6 +133,7 @@ exports.profile = (req, res) => {
         return res.status(400).json({"error" : "wrong token"})
     }
 
+    //Permet de trouver un utilisateur dans la BD
     models.User.findOne({
     attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio', 'imageProfile', 'isAdmin'],
     where: { id : userId }
@@ -133,7 +150,9 @@ exports.profile = (req, res) => {
      })
 },
 
+//Permet à un utilisateur de modifier son profil
 exports.updateProfile = (req, res) => {
+    //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
@@ -176,7 +195,9 @@ exports.updateProfile = (req, res) => {
     
 }
 
+//Permet à un utilisateur de supprimer son compte ainsi que ses données personnelles
 exports.deleteAccount = (req,res) => {
+    //Vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});

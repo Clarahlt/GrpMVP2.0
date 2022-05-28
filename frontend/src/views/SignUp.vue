@@ -4,6 +4,7 @@
     <img class="img-fluid img-logo-groupomania" src="../assets/icon-white.png" alt="logo de l'entreprise groupomania"/>
   </div>
   <div class="signup">
+    <!-- Formulaire de création de compte -->
     <form @submit.prevent="login" class="signup-form">
         <h1>S'inscrire</h1>
 
@@ -33,7 +34,8 @@
         </div>
 
         <button class="btn btn-primary btn-form" v-on:click="postUser()" type="button"> S'incrire </button>
-
+        
+        <!-- Lien de redirection vers la page de connexion -->
         <p>Vous avez déjà un compte?<router-link to="/" class="home-display-login-form">Se connecter</router-link></p>
       
       </form>
@@ -43,6 +45,7 @@
 
 
 <script>
+//imports
 import axios from 'axios';
 import { Notyf } from 'notyf'
 import 'notyf/notyf.min.css'
@@ -68,6 +71,7 @@ export default {
             });
         },
     methods: {
+      //Permet de s'inscrire et de basculer sur la page d'entrée
         postUser(){
           axios.post('http://localhost:3000/api/users/signup', {
                     username: this.username,

@@ -10,6 +10,7 @@
 
 
 <script>
+//Imports
     import axios from 'axios'
     import { Notyf } from 'notyf'
     import 'notyf/notyf.min.css'
@@ -33,7 +34,7 @@
             this.displayHeartColor()
         },
         methods:{
-            // Permet d'aimer un message
+            // Permet de liker un message ou de dislike ce message
             postLike(){
                 const messageId = this.post.id
                 const userId = this.userId
@@ -91,7 +92,7 @@
                     console.log(error.response.data);
                 })
             },
-
+            //si un message est liké, permet d'afficher une icone "coeur" remplie
             displayHeartColor(){
                 const messageId = this.post.id
                 axios.get('http://localhost:3000/api/users/messages/' + messageId, {

@@ -16,16 +16,16 @@ module.exports = {
         // **required**
         // Where is your project?
         // It is relative to `vetur.config.js`.
-        root: 'frontend/public/index.html',
+        root: './frontend/public/index.html',
         // **optional** default: `'package.json'`
         // Where is `package.json` in the project?
         // We use it to determine the version of vue.
         // It is relative to root property.
-        package: 'frontend/package.json',
+        package: './frontend/package.json',
         // **optional**
         // Where is TypeScript config file in the project?
         // It is relative to root property.
-        tsconfig: 'frontend/tsconfig.json',
+        tsconfig: './frontend/tsconfig.json',
         // **optional** default: `'./.vscode/vetur/snippets'`
         // Where is vetur custom snippets folders?
         snippetFolder: '.vscode/vetur/snippets',
@@ -35,7 +35,7 @@ module.exports = {
         // It is relative to root property.
         // Notice: It won't actually do it. You need to use `require.context` or `Vue.component`
         globalComponents: [
-          'frontend/src/components/**/*.vue'
+          './frontend/src/components/**/*.vue'
         ]
       }
     ]
