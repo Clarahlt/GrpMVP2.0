@@ -36,7 +36,7 @@
         <button class="btn btn-primary btn-form" v-on:click="postUser()" type="button"> S'incrire </button>
         
         <!-- Lien de redirection vers la page de connexion -->
-        <p>Vous avez déjà un compte?<router-link to="/" class="home-display-login-form">Se connecter</router-link></p>
+        <p>Vous avez déjà un compte? <router-link to="/" class="home-display-login-form">Se connecter</router-link></p>
       
       </form>
     </div> 
@@ -110,9 +110,10 @@ export default {
 .signup-form{
   border: 3px solid #3f3d56;
   border-radius: 25px;
-  background: linear-gradient(0deg, #24586d, transparent);
+  background: linear-gradient(0deg, white, transparent);
   width: 35%;
   margin: auto;
+  color: white;
   @media (max-width: 776px) {
     width: 90%;
     margin-bottom: 10px;
@@ -139,9 +140,11 @@ export default {
   .btn-form{
     margin: 15px;
     width: 30%;
+
   }
   p{
     margin: 25px;
+    color: #4E5166;
   }
 }
 

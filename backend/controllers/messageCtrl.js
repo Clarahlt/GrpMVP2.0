@@ -149,7 +149,45 @@ exports.deletePost = (req,res) => {
     .catch(()=> {
         return res.status(500).json({"error" : "Cannot find this message"})
     })
+}
 
+//Permet de modifier un post
+exports.modifyPost = (req,res) => {
+   //Permet de vérifier le token
+   headerAuth = req.headers['authorization'].split('Bearer ')[1];
+   userId = auth.verifyToken(headerAuth)
+   console.log({"verify": userId});
 
+    const messageId = req.params.messageId
+    const title = req.body.title
+    console.log(title);
+    const content = req.body.content
+    const attachment = req.file ?
+    {
+     ...req.body,
+     image: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
 
+    models.Message.findOne({
+            attributes: ['id', 'title', 'content', 'attachment'],
+            where : { id: messageId, 
+            userId : userId}
+        })
+        .then((messageFound) => {
+             if(messageFound){
+                messageFound.update(attachment, {
+                    title: (title ? title : messageFound.title),
+                    content: (content ? content : messageFound.content),
+                    attachment: (attachment ? attachment : messageFound.attachment)
+                })
+                return res.status(200).json(messageFound)
+            } else {
+                return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
+            }
+        })
+        .catch(function(err){
+            console.log(err);
+            return res.status(500).json({"error" : "Impossible de vérifier"})
+        })
+        
 }

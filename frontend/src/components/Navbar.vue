@@ -6,7 +6,7 @@
                 <ul class="nav-links">
                     <li class="item item-logo">
                         <div class="color-logo">
-                            <img class="img-logo" src="../assets/logo-white.png" alt="logo entreprise">
+                            <img class="img-logo" src="../assets/icon.png" alt="logo entreprise">
                         </div>
                     </li>
                     <li class="item">
@@ -51,7 +51,7 @@ import Logout from '../components/Logout.vue'
         z-index: 1;
     }
     nav {
-        background: white;
+        background: #4E5166;;
         display: flex;
         justify-content: flex-end;
         align-items: baseline;
@@ -61,40 +61,27 @@ import Logout from '../components/Logout.vue'
             justify-content: center;
         }
         .nav-items{
+            width: 100%;
             @media (max-width: 776px){
                 width: 100%;
             }
         }
         
         .nav-links{
+            justify-content: space-around;
             display: flex;
             list-style: none;
             flex-direction: row;
-            margin-top: 10px;
-            align-items: center;
+            margin: auto;
+            align-items: baseline;
             @media (max-width: 776px){
                 padding: 0;
             }
             .item-logo{
-                .color-logo{
-                    position: absolute;
-                    top: 3px;
-                    left: 47px;
-                    width: 70px;
-                    height: 70px;
-                    background: #A4C2A5;
-                    border-radius: 50px;
-                    @media (max-width: 776px){
-                        width: 40px;
-                        height: 40px;
-                        position: initial; 
-                    }
-                }
+                width: 70px;
                 img{
                     width: 95%;
-                    position: relative;
-                    top: -2px;
-                    left: 1px;
+                    border-radius: 50%;
                     @media (max-width: 776px){
                         width: 99%;
                         position: relative;
@@ -103,21 +90,20 @@ import Logout from '../components/Logout.vue'
                     }
                 }
             }
-            .item{ 
-                margin: 5px 30px;
+            .item{
                 @media (max-width: 776px){
                     margin: 0 auto;
                 }
                 a, button{
                     display: flex;
                     text-decoration: none;
-                    color: #A4C2A5;
+                    color: #FFD7D7;
                     font-weight: bold;
                     i{
                         margin: 0 5px;
                     }
                     &:hover, &:focus  {
-                        color: #ff6363;
+                        color: #FD2D01;
                     }
                     p{
                         @media (max-width: 776px){
@@ -127,9 +113,9 @@ import Logout from '../components/Logout.vue'
                 }
                 .logout{
                     border: none;
-                    background-color: white;
+                    background-color: #4E5166;
                     &:hover, &:focus  {
-                        color: #ff6363;
+                        color: #FD2D01;
                     }
                 }
             }

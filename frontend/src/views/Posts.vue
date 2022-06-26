@@ -1,80 +1,139 @@
 <template>
-    <div id="app">
+    <div id="app" class="app-posts">
         <Navbar/>
 
         <div class="container">
 
             <div class="row display-post">
 
-            <aside class="col- col-xl-3 profile-box">
-            
-
-            </aside>
-            <!-- Bloc de création de post -->
-            <div class="col-sm-10 col-lg-8 col-xl-6  txtarea-post">
-                <div class="row post">
-                    <ProfileImage :src="imageProfile" class="icon-img-profile"/>
-                    <div class="col">  
-                    <input v-model="title" class="form-text title-post" type="title" id="title" name="title" placeholder="Votre titre">
-                    <input v-model="content" class="form-text content-post" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?...">
+                <aside class="col- col-xl-3 profile-box">
+                    
+                </aside>
+                <!-- Bloc de création de post -->
+                <div class="col-sm-10 col-lg-8 col-xl-6  txtarea-post">
+                    <div class="row post">
+                        <div v-if="imageProfile == 'null'" class="icon-img-profile"><i class="bi bi-person-circle"></i></div>
+                        <div v-else-if="imageProfile !== 'null'" class="icon-img-profile"><ProfileImage :src="imageProfile"/></div>
+                        <div class="col">  
+                            <input v-model="title" class="form-text title-post" type="title" id="title" name="title" placeholder="Votre titre">
+                            <input v-model="content" class="form-text content-post" type="post" id="post" name="post" placeholder="Quoi de neuf dans la boîte ?...">
+                        </div>
+                    </div>
+                    <div class="row post-tools">
+                        <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image">Image</i></button> 
+                        <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
+    
+                        <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube">Vidéo</i></button>
+                        <button type="submit" @click="createPost" class="col-md-6 col-6 btn btn-sm btn-submit">Publier</button>
                     </div>
                 </div>
-                <div class="row post-tools">
-                    <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i> image</button> 
-                    <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
-    
-                    <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> Vidéo</button>
-                    <button type="submit" @click="createPost" class="col-md-6 col-6 btn btn-secondary btn-sm btn-submit">Publier</button>
-                </div>
-            </div>
 
-            <!-- Aside agenda Google-->
-            <aside class="col- col-xl-3 aside-agenda">
-                <div class="agenda">
-                    <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
-                </div>
-            </aside>
+                <!-- Aside agenda Google-->
+                <aside class="col- col-xl-3 aside-agenda">
+                    <div class="agenda">
+                        <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
+                    </div>
+                </aside>
 
-            <!-- Bloc affichant les posts -->
-            <div class="displayPost" v-for="post in posts" :key="post.id">
-                <div class="displayPost__item">
-                    <div class="row display-content-post">
-                        <div :contentPostId="post.id" class="col-sm-10 col-lg-8 col-xl-6 card-post">
-                            <div class="card modele-post ">
-                                <div class="card-title" >
-                                    <div v-if="!post.User.imageProfile" class="icon-user-post"><i class="bi bi-person-circle"></i></div>
-                                    <div v-else-if="post.User.imageProfile"><ProfileImage :src="post.User.imageProfile" class="icon-user-post"/></div>
+                <!-- Bloc affichant les posts -->
+                <div class="displayPost" v-for="post in posts" :key="post.id">
+                    <div class="displayPost__item">
+                        <div class="row display-content-post">
+                            <div :PostId="post.id" class="col-sm-10 col-lg-8 col-xl-6 card-post">
+                                <div class="card modele-post ">
+                                    <div class="card-title" >
+                                        <div v-if="!post.User.imageProfile" class="icon-user-post"><i class="bi bi-person-circle"></i></div>
+                                        <div v-else-if="post.User.imageProfile"><ProfileImage :src="post.User.imageProfile" class="icon-user-post"/></div>
                                     
-                                    <div class="title">
-                                        <h5 class="username-post">{{ post.User.username }}</h5>
-                                        <h6 class="text-muted">{{ post.title }}</h6>
-                                    </div>
-                                    <div v-if="post.userId == this.userId" class="dropdown">
-                                        <button type="button" class="btn" data-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
-                                        <div class="dropdown-menu">
-                                            <a class="dropdown-item" href="#">Modifier</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a :messageId="post.id" @click="deletePost(post.id)" class="dropdown-item" href="#">Supprimer</a> 
+                                        <div class="title">
+                                            <h5 class="username-post">{{ post.User.username }}</h5>
+                                            <h6 class="text-muted">{{ post.title }}</h6>
+                                        </div>
+                                        <!-- Dropdown menu: Modification/suppression d'un post-->
+                                        <div v-if="post.userId == this.userId || this.isAdmin == 'true'" class="dropdown">
+                                            <button type="button" class="btn" data-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+                                            <div class="dropdown-menu">
+                                                <a v-if="post.userId == this.userId" @click="displayModificationBloc(post.id)" class="dropdown-item" href="#">Modifier</a>
+                                                <div v-if="post.userId == this.userId" class="dropdown-divider"></div>
+                                                <a @click="deletePost(post.id)" class="dropdown-item" href="#">Supprimer</a> 
+                                            </div>
                                         </div>
                                     </div>
-                                    <div v-else-if="post.userId !== this.userId"></div>
-                                </div>
-                                <div v-if="!post.attachment" class="img-post">
-                                </div>
-                                <div v-else-if="post.attachment" class="img-post">
-                                    <img :src="post.attachment" alt="image du message">
-                                </div>
+                                    <div v-if="!post.attachment" class="img-post">
+                                    </div>
+                                    <div v-else-if="post.attachment" class="img-post">
+                                        <img :src="post.attachment" alt="image du message">
+                                    </div>
                                 
-                                <p class="card-text">{{ post.content }}</p>
-                                <div class="card-footer text-muted">
-                                    <p class="post-date">Publié le {{ dateFormat(post.createdAt) }}</p>
-                                    <Likes v-bind:post="post"/>                                    </div>
-                                
-                            </div>
-                        </div>                
+                                    <p class="card-text">{{ post.content }}</p>
+
+                                    <div class="card-footer text-muted">
+                                        <p class="post-date">Publié le {{ dateFormat(post.createdAt) }}</p>
+                                        <Likes v-bind:post="post"/>
+                                        <button v-on:click="displayComments" class="btn-comments btn" type="button"><i class="bi bi-chat-dots"></i></button>
+                                    </div>
+                                    <!-- Bloc affichant les commentaires -->
+                                    <div class="users-comments" v-show="commentsBloc">
+                                        <div class="user-comment">
+                                            <div class="add-comment">
+                                                <div v-if="!post.User.imageProfile" class="icon-user-post"><i class="bi bi-person-circle"></i></div>
+                                                <div v-else-if="post.User.imageProfile"><ProfileImage :src="post.User.imageProfile" class="icon-user-post"/></div>
+                                            </div>
+                                            <input class="input-add-comment" placeholder="Ajouter un commentaire...">
+                                        </div>
+                                        <hr>
+                                        <div class="comment-bloc">
+                                            <p class="text-muted">aucun commentaire.</p>
+                                            <article>
+                                                <div class="comment-content"></div>
+                                            </article>
+                                        </div>
+                                    </div>
+                                    <!-- Bloc permettant de modifier le profil -->
+                                    <div v-show="bloc" class="bloc">
+                                        <div class="overlay"></div>
+                                        <div class="bloc-modify-post container">
+                                            <div class="row modify-post-menu">
+                                                <div @click="closeModificationBloc(post.id)" class="col-6 icon-bloc-close-to-modify">
+                                                    <i class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
+                                                </div>
+                                                <div class="col-6 save-btn">
+                                                    <button v-on:click="updatePost(post.id)" class="btn">Enregistrer</button>
+                                                </div>
+                                            </div>
+                                            <div class="row modify-post">
+                                                <div class="col-6 media">
+                                                    <div v-if="newAttachment != ''" class="img-post">
+                                                        <img :src="newAttachment" alt="image du message">
+                                                    </div>
+                                                </div>
+                                                <div class="col-6 content-post-to-modify">
+                                                    <div class="row title-grp">
+                                                        <div v-if="!imgUserPostId" class="col-4 user-logo"><i class="bi bi-person-circle"></i></div>
+                                                        <div v-else-if="imgUserPostId" class="col-4 user-logo"><img :src="imgUserPostId"/></div>
+                                                        <div class="col-8 title-rename">
+                                                            <h5 class="username">{{ usernamePostId }}</h5>
+                                                            <textarea v-model="newTitle" id="title-rename" class="title-to-modify"></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="contents-grp">
+                                                        <textarea v-model="newContent" class="text-to-modify"></textarea>
+                                                    </div>
+                                                    <div class="row media-tools">
+                                                        <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i></button> 
+                                                        <!-- <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil"> -->
+    
+                                                        <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>  
     </div>
@@ -107,6 +166,14 @@ import Likes from '../components/Likes.vue'
                 attachment: '',
                 file: '',
                 likes: 0,
+                commentsBloc: false,
+                bloc: false,
+
+                newTitle: '',
+                newContent: '',
+                imgUserPostId: '',
+                usernamePostId: '',
+                newAttachment: '',
             }
         },
         created(){
@@ -169,6 +236,10 @@ import Likes from '../components/Likes.vue'
                     this.notyf.error(msgerror.error)
                 })
             },
+            // Permet d'afficher les commentaires d'un post
+             displayComments() {
+                this.commentsBloc = !this.commentsBloc
+            },
             // Permet d'afficher la date de publication au bon format
             dateFormat(date){
                 if (date) {
@@ -177,7 +248,7 @@ import Likes from '../components/Likes.vue'
             },
             //Permet de supprimer un post
             deletePost(id){
-                const messageId = id;               
+                const messageId = id;              
                 axios.delete('http://localhost:3000/api/users/messages/' + messageId, {
                     headers: {
                         'Content-Type' : 'application/json',
@@ -191,6 +262,62 @@ import Likes from '../components/Likes.vue'
                     const msgerror = error.response.data
                     this.notyf.error(msgerror.error)
                 })                
+            },
+            displayModificationBloc(id){
+                const messageId = id;  
+                console.log(messageId);
+                this.bloc = !this.bloc
+                axios.get('http://localhost:3000/api/users/messages/' + messageId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((res) => {
+                    const messageById = res.data.messageFound
+                    console.log(messageById);
+                        this.imgUserPostId = messageById.User.imageProfile
+                        this.usernamePostId = messageById.User.username
+                        this.newTitle = messageById.title
+                        this.newContent = messageById.content
+                        this.newImg = messageById.attachment
+                })
+                .catch(error => {
+                    const msgerror = error.response.data
+                    this.notyf.error(msgerror.error)
+                })
+            },
+            closeModificationBloc(id){
+                const messageId = id;
+                console.log(messageId);
+                this.bloc = !this.bloc
+            },
+            updatePost(id){
+                const messageId = id;
+
+                const message = {
+                    title: this.newTitle,
+                    content: this.newContent,
+                    attchement: this.newAttachment
+                }      
+                console.log(message);
+                axios.put('http://localhost:3000/api/users/messages/' + messageId, message,{
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((res)=>{
+                    console.log(res.data);
+                    this.content = res.data.content
+                    this.title = res.data.title
+                    this.attachment = res.data.attachment
+                    window.location.reload()
+                    
+                })
+                .catch((err)=> {
+                    console.log(err);
+                })
             }
         },
         
@@ -198,6 +325,9 @@ import Likes from '../components/Likes.vue'
 </script>
 
 <style lang="scss" scoped>
+.app-posts{
+  background: #F6F8FB;
+}
 .container{
     @media (max-width: 776px){
       padding-top: 100px;
@@ -205,13 +335,14 @@ import Likes from '../components/Likes.vue'
 }
 
 .display-post{
+    margin: 30px auto;
     @media (max-width: 776px) {
         width: 95%;
         margin: auto;
     }
     .txtarea-post{
         height: fit-content;
-        background: #F7F7F7;
+        background: #4E5166;
         padding: 10px;
         margin: 20px auto;
         border-radius: 10px;
@@ -252,14 +383,14 @@ import Likes from '../components/Likes.vue'
             
         }
         .btn{
-            color: #4A4A48;
+            color: #FFD7D7;
             font-weight: bold;
             font-size: 13px;
             svg{
             margin-right: 5px;
             }
             &:hover{
-                color: #ff6363;
+                color: #FD2D01;
             }
         }
         input{
@@ -267,8 +398,14 @@ import Likes from '../components/Likes.vue'
         }
         .btn-submit{
                 width: 15%;
+                background: #FFD7D7;
+                color: #FD2D01;
                 @media (max-width: 776px){
                     width: 25%;
+                }
+                &:hover{
+                    border-color: white;
+                    color: #FD2D01;
                 }
             }
     }
@@ -281,6 +418,111 @@ import Likes from '../components/Likes.vue'
             padding: 9px;
         }
     }
+}
+.bloc{
+        position: absolute;
+        .overlay {
+            background: rgba(0,0,0,0.5);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            }
+        .bloc-modify-post{
+            position: fixed;
+            top: 50px;
+            bottom: 50px;
+            left: 0;
+            right: 0;
+            border-radius: 10px;
+            width: 55%;
+            margin: 15px auto;
+            z-index: 1;
+            @media (max-width: 776px){
+                width: 95%;
+                padding: 0;
+            }
+        }
+        .modify-post-menu{
+            padding: 10px;
+            background: white;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            align-items: end;
+            border-bottom: 1px solid lightgray;
+            .icon-bloc-close-to-modify{
+                top: 10px;
+                right: 10px;
+                text-align-last: left;
+                &:hover, &:focus {
+                    color: #ff6363;
+                    }
+            }
+            .save-btn{
+                text-align-last: right;
+                .btn{
+                    &:hover, &:focus {
+                    color: #ff6363;
+                    }
+                }
+            }
+        }
+        .modify-post{
+            background: white;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            height: 400px;
+            position: relative;
+            .media{
+                align-self: center;
+            }
+            .content-post-to-modify{
+                border-left: 1px solid lightgray;
+                textarea{
+                    width: 100%;
+                    border: none;
+                    resize: none;
+                    outline: none;
+                    }
+                .title-grp{
+                    align-items: center;
+                    margin-top: 20px;
+                    .user-logo{
+                        text-align: start;
+                            height: 85px;
+                            width: 85px;
+                        img{
+                            width: 100%;
+                        }
+                    }
+                    .title-rename{
+                        .username{
+                            text-align-last: left;
+                            margin-left: 10px;
+                        }
+                        .title-to-modify{
+                            margin-left: 10px;
+                        }
+                    }
+                }
+                .contents-grp{
+                    .text-to-modify{
+                            height: 250px;
+                            padding: 1%;
+                        }
+                }
+                .media-tools{
+                        position: absolute;
+                        bottom: 0;
+                        width: 50%;
+                        justify-content: flex-end;
+                        border-top: 1px solid lightgray;
+                    }
+            }
+            
+            
+        }
 }
 .display-content-post{
     .card-post{
@@ -338,7 +580,33 @@ import Likes from '../components/Likes.vue'
                     right: 20px;
                     display: flex;
                 }
+                .btn-comments{
+                    position: absolute; 
+                    right: 70px;
+                    display: flex;
+                    font-size: 22px;
+                    bottom: -7px;
+                }
             }
+            .users-comments{
+                .user-comment{
+                    display: flex;
+                    padding: 10px;
+                }
+                .input-add-comment{
+                    width: 100%; 
+                    margin: 8px;
+                    border-radius: 16px;
+                    border: lightgrey 1px solid;
+                    font-size: 12px;
+                }
+                .comment-bloc{
+                    p{
+                        text-align: center;
+                    }
+                }
+            }
+
         }
     }
 }

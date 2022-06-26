@@ -5,6 +5,9 @@ const auth = require('../middlewares/auth');
 //Importe le modèle utilisateur
 const models = require('../models');
 
+// Importe l'outil de cryptage/decryptage mail
+const { encrypt, decrypt } = require ('../utils/Email');
+
 // Regex de validation
  const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 // const passwordRegex = /^((?=.*[a-z])+(?=.*[A-Z])+(?=.*[0-9])+(?=.*[!@#\$%\^&\*])).{8,20}$/;
@@ -39,12 +42,12 @@ exports.signup = (req, res, next) => {
     .then(function(userFound){
         //Si l'utilisateur n'est pas trouvé dans la BD
         if(!userFound) {
-
+            const emailEncrypted = encrypt(req.body.email)
             //un nouvel utilisateur est créé et son mot de passe est salé avant d'être stocké
             bcrypt.genSalt(5, function(err, salt){
                 bcrypt.hash(req.body.password, salt, function(error, bcryptedPassword){
                     const newUser = models.User.create({
-                        email : email,
+                        email : emailEncrypted,
                         username : username,
                         lastname : lastname,
                         firstname : firstname,
@@ -53,9 +56,7 @@ exports.signup = (req, res, next) => {
                     })
                     .then(function(newUser){
                         return res.status(201).json({
-                            userId : newUser.id,
-                            password : bcryptedPassword,
-                            token : "RANDOM_TOKEN_SECRET"
+                            message: "L'utilisateur a été créé!"
                         })
                     })
                     .catch(function(error){
@@ -76,7 +77,7 @@ exports.signup = (req, res, next) => {
 exports.login = (req, res) => {
     email = req.body.email
     password = req.body.password
-
+    console.log(encrypt(email));
 
     //Permet de vérifier que tous les champs sont complétés
     if(email == "" || password == ""){
@@ -85,10 +86,11 @@ exports.login = (req, res) => {
 
     //Permet de vérifier si l'utilisateur existe dans la BD
     models.User.findOne({
-        where: { email : email }
+        where: { email : encrypt(email) }
     })
     .then(function(userFound){
         //Si l'utilisateur est trouvé
+        console.log(userFound);
         if(userFound){
             //bcrypt compare le mdp entré en clair avec le mot de passe salé de la BD
             bcrypt.compare(password, userFound.password, function(err, results){
@@ -97,7 +99,7 @@ exports.login = (req, res) => {
                 return res.status(200).json({
                     results : results,
                     userId: userFound.id,
-                    email: userFound.email,
+                    email: decrypt(userFound.email),
                     username: userFound.username,
                     lastname: userFound.lastname,
                     firstname: userFound.firstname,
@@ -129,7 +131,7 @@ exports.profile = (req, res) => {
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
-    if(userId < 0){
+    if(userId < 0 ){
         return res.status(400).json({"error" : "wrong token"})
     }
 
@@ -140,7 +142,16 @@ exports.profile = (req, res) => {
      })
     .then(function(user){
         if(user){
-            return res.status(200).json({user : user})
+            const userDetails={
+            username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            bio: user.bio,
+            email: decrypt(user.email),
+            isAdmin: user.isAdmin,
+            imageProfile: user.imageProfile
+        }
+            return res.status(200).json({user : userDetails})
         } else {
             res.status(404).json({ "error" : "Utilisateur non autorisé"});
         }
@@ -167,7 +178,6 @@ exports.updateProfile = (req, res) => {
      ...req.body,
     imageProfile: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body };
-    console.log(userPic)
 
     models.User.findOne({
             attributes: ['id', 'username', 'lastname', 'firstname', 'bio', 'email', 'imageProfile'],
@@ -180,12 +190,12 @@ exports.updateProfile = (req, res) => {
                     lastname: (lastname ? lastname : userFound.lastname),
                     firstname: (firstname ? firstname : userFound.firstname),
                     bio : (bio ? bio : userFound.bio),
-                    email: (email ? email : userFound.email),
+                    email: ( email  ? email : userFound.email),
                     imageProfile: (userPic ? userPic : userFound.imageProfile)
                 })
             } else {
                 return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
-            }
+             }
             return res.status(201).json({userFound})
         })
         .catch(function(err){

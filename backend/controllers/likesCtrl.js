@@ -10,6 +10,7 @@ const LIKED = 1;
 
 //Permet d'obtenir et d'afficher le nombre de likes ou dislikes
 exports.getLikes = (req, res, next) => {
+    //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
@@ -19,22 +20,27 @@ exports.getLikes = (req, res, next) => {
 
     models.Like.findOne({
              where: {
-                userId: userId,
                 messageId: messageId,
+                userId : userId,
         }
      }).then((like) => {
          models.Message.findOne({
              where: {
                  id : messageId,
-                 userId : userId
-             }
+             },
+             include: [{
+                model: models.User,
+                as : "User",
+                attributes: ['username', 'imageProfile'],
+                
+            }]
          }).then((messageFound)=>{
              return res.status(200).json({"like" : like, "messageFound" : messageFound})
-         }).catch((error)=>{
+         }).catch(()=>{
              return res.status(404).json({"error" : "Cannot find message"})
          })
         
-    }).catch((error) => {
+    }).catch(() => {
          return res.status(404).json({"error" : "Cannot find all likes"})
      })
 

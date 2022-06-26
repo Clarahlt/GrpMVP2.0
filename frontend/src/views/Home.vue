@@ -1,5 +1,5 @@
 <template>
-  <div id="home">
+  <div id="home" class="home">
     <div class="container bloc-logo-groupomania">
       <img
         class="img-fluid img-logo-groupomania"
@@ -51,7 +51,7 @@ export default {
 }
 .btn-connect {
   font-weight: bold;
-  color: #3f3d56;
+  color: white;
   border: 3px solid #3f3d56;
   border-radius: 25px;
 }

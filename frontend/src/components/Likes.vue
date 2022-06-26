@@ -1,6 +1,6 @@
 <template>
     <div class="post-likes">
-        <button @click="postLike()" :name="post.id" class="heart_action">
+        <button @click="postLike(post.id)" :name="post.id" class="heart_action">
             <i class="bi bi-heart empty_heart"></i>
             <i class="bi bi-heart-fill full_heart"></i>
         </button>
@@ -38,13 +38,15 @@
             postLike(){
                 const messageId = this.post.id
                 const userId = this.userId
+                console.log(userId);
                 axios.get('http://localhost:3000/api/users/messages/' + messageId, {
                     headers: {
                         'Content-Type' : 'application/json',
                         'Authorization' : 'Bearer ' + localStorage.getItem('token')
                     }
-                }).then((res) => {
-                    const like = res.data.like
+                }).then((response) => {
+                    const like = response.data.like
+                    console.log(like);
                     if(like === null || like.isLike === 0){
                         axios.post('http://localhost:3000/api/users/messages/' + messageId + '/like',{
                             messageId,
@@ -62,7 +64,7 @@
                             fillHeart.className = 'heart_action display_heart_color'
                         })
                         .catch((error) => {
-                            console.log(error.response.data);
+                            console.log(error.res.data);
                         })
                     } else {
                         if(like.isLike === 1){
@@ -143,7 +145,7 @@
                         outline: none;
                         .full_heart, .empty_heart{
                             transition: all 1s ease-out;
-                            background: yellowgreen;
+                            background: #FD2D01;
                             -webkit-background-clip: text;
                             -webkit-text-fill-color: transparent;
                         }

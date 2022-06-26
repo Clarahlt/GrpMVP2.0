@@ -23,12 +23,13 @@ router.delete('/profile/:id', userCtrl.deleteAccount);
 ///Pour les messages
 router.post('/messages/create', multer, messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);
+router.put('/messages/:messageId', messageCtrl.modifyPost);
+router.delete('/messages/:messageId', messageCtrl.deletePost);
 
 ///Pour les likes
 router.get('/messages/:messageId', likesCtrl.getLikes)
 router.post('/messages/:messageId/like', likesCtrl.like);
 router.post('/messages/:messageId/dislike', likesCtrl.dislike);
-router.delete('/messages/:messageId', messageCtrl.deletePost);
 
 //Exporte le routeur
 module.exports = router;

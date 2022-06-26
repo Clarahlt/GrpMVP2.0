@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div id="app" class="app-profile">
         <Navbar/>
         <div class="container welcom">
             <h1 v-if="user" class="title">Bienvenue {{ user.username }} !</h1>
@@ -157,6 +157,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
 				.then(response => {
 					this.user = response.data.user;
                     localStorage.setItem('imageProfile', this.user.imageProfile)
+                    console.log(this.user);
 				})
 				.catch(error => {
 					const msgerror = error.response.data
@@ -249,6 +250,9 @@ import DeleteAccount from '../components/DeleteAccount.vue'
 </script>
 
 <style lang="scss" scoped>
+.app-profile{
+   background: #F6F8FB;
+}
 .welcom{
     @media (max-width: 776px){
       padding-top: 100px;
@@ -299,7 +303,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
         background: white;
         position: relative;
         top: -10px;
-        z-index: -1;
+        z-index: 1;
     }
     .navbar-profile{
         .nav{
@@ -338,6 +342,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
             right: 0;
             }
         .bloc-form{
+            z-index: 2;
             position: fixed;
             top: 0;
             bottom: 0;

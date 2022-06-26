@@ -95,9 +95,10 @@ export default {
 .login-form{
   border: 3px solid #3f3d56;
   border-radius: 25px;
-  background: linear-gradient(0deg, #24586d, transparent);
+  background: linear-gradient(0deg, white, transparent);
   width: 35%;
   margin: auto;
+  color: white;
   @media (max-width: 776px) {
     width: 90%;
   }
@@ -142,6 +143,7 @@ export default {
   }
   p{
     margin: 25px;
+    color: #4E5166;
   }
 }
 
