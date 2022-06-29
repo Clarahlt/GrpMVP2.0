@@ -23,7 +23,7 @@ router.delete('/profile/:id', userCtrl.deleteAccount);
 ///Pour les messages
 router.post('/messages/create', multer, messageCtrl.createPost);
 router.get('/messages/', messageCtrl.listPost);
-router.put('/messages/:messageId', messageCtrl.modifyPost);
+router.put('/messages/:messageId', multer, messageCtrl.modifyPost);
 router.delete('/messages/:messageId', messageCtrl.deletePost);
 
 ///Pour les likes

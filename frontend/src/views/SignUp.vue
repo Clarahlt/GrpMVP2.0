@@ -81,7 +81,8 @@ export default {
                     password: this.password,
                     
                 })
-                .then(() => {
+                .then((response) => {
+                  console.log(response.data);
                     this.notyf.success('Votre compte a bien été créé ! A présent, veuillez vous connecter.')
                     this.$router.push('/');
                 })

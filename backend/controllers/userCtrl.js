@@ -8,9 +8,9 @@ const models = require('../models');
 // Importe l'outil de cryptage/decryptage mail
 const { encrypt, decrypt } = require ('../utils/Email');
 
-// Regex de validation
- const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-// const passwordRegex = /^((?=.*[a-z])+(?=.*[A-Z])+(?=.*[0-9])+(?=.*[!@#\$%\^&\*])).{8,20}$/;
+// Importation de l'outil Password 
+const { isPasswordValid, validationMessages } = require('../utils/Password');
+
 
 //Permet de créer un nouvel utilisateur 
 exports.signup = (req, res, next) => {
@@ -24,15 +24,17 @@ exports.signup = (req, res, next) => {
     if(email == "" || username == "" || lastname == "" || firstname == "" || password == "") {
         return res.status(400).json({ "error" : "Tous les champs doivent être remplis !"})
     } 
-     
-    // Regex Validation EMAIL/USERNAME/PASSWORD
-    if(!emailRegex.test(email)) {
-        return res.status(400).json({"error": "l'email n'est pas valide"})
-    }
 
-    // if(!passwordRegex.test(password)){
-    //     return res.status(400).json({"error": "Le mot de passe doit contenir au moins un caractère spécial, une lettre majuscule, une lettre minuscule, et un chiffre - et doit être compris entre 7-20 caractères"})
-    // }
+   // Vérification de la validité du mot de passe
+    if (!isPasswordValid(req.body.password)) {
+        return res.status(400).json({
+            message: validationMessages(req.body.password)
+        });
+    }
+     // Vérification de la syntaxe de l'email grâce à Regex
+     else if (!/^[\w-\.]{3,20}@([\w-]{3,}\.)+[\w-]{2,4}$/.exec(req.body.email)) {
+        return res.status(400).json({error: "Email n'est pas valide. Veuillez utiliser une syntaxe correcte"}); 
+        }
 
     //Permet de vérifier que l'utilisateur existe dans la base de données
     models.User.findOne({
@@ -110,7 +112,7 @@ exports.login = (req, res) => {
 
                 }) } else {
                     return res.status(404).json({
-                        "mess" : "mot de passe incorrect"
+                        "error" : "mot de passe incorrect"
                     })
                 }
                })
@@ -212,20 +214,33 @@ exports.deleteAccount = (req,res) => {
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
-    models.User.findOne({
-        attributes: ['id'],
-        where : { id: userId}
-    }).then((userFound) => {
-        if(userFound){
-            models.User.destroy({
-                where: { id : userId }
-            }).then(()=> res.status(200).json({"message" : "Votre compte a été supprimé !"}))
-            .catch(()=> res.status(500).json({ "error" : "⚠ Oops, une erreur s\'est produite !"}))
+    models.Like.findAll({
+        where: { userId : userId}
+    })
+    .then((likesFound)=>{
+        if(likesFound){
+            models.Like.destroy({
+                where: { userId : userId}
+            })
+            .then((likesDeleted) => {
+                models.User.destroy({
+                    where: { id : userId}
+                })
+                .then((userDeleted) => {
+                    return res.status(200).json({"message" : "Votre compte a bien été supprimé !"})
+                })
+                .catch((error) => {
+                    return res.status(400).json({"error" : "Un problème est survenu lors de la suppréssion du compte"})
+                })
+            })
+            .catch((error) => {
+                return res.status(400).json({"error" : "Impossible de supprimer les likes de l'utilisateur"})
+            })
         } else {
-            return res.status(404).json({"error" : "Utilisateur non trouvé"})
+
         }
     })
-    .catch(function(err){
-        return res.status(500).json({"error" : "Impossible de vérifier l'utilisateur"})
+    .catch((error)=>{
+        return res.status(500).json({"error" : "un problème est survenu lors de la recherche concernant les interractions de l'utilisateur."})
     })
 }

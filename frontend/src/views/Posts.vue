@@ -70,26 +70,10 @@
                                     <div class="card-footer text-muted">
                                         <p class="post-date">Publié le {{ dateFormat(post.createdAt) }}</p>
                                         <Likes v-bind:post="post"/>
-                                        <button v-on:click="displayComments" class="btn-comments btn" type="button"><i class="bi bi-chat-dots"></i></button>
+                                        <button class="btn-comments btn" type="button"><i class="bi bi-chat-dots"></i></button>
                                     </div>
-                                    <!-- Bloc affichant les commentaires -->
-                                    <div class="users-comments" v-show="commentsBloc">
-                                        <div class="user-comment">
-                                            <div class="add-comment">
-                                                <div v-if="!post.User.imageProfile" class="icon-user-post"><i class="bi bi-person-circle"></i></div>
-                                                <div v-else-if="post.User.imageProfile"><ProfileImage :src="post.User.imageProfile" class="icon-user-post"/></div>
-                                            </div>
-                                            <input class="input-add-comment" placeholder="Ajouter un commentaire...">
-                                        </div>
-                                        <hr>
-                                        <div class="comment-bloc">
-                                            <p class="text-muted">aucun commentaire.</p>
-                                            <article>
-                                                <div class="comment-content"></div>
-                                            </article>
-                                        </div>
-                                    </div>
-                                    <!-- Bloc permettant de modifier le profil -->
+                                    
+                                    <!-- Bloc permettant de modifier un post -->
                                     <div v-show="bloc" class="bloc">
                                         <div class="overlay"></div>
                                         <div class="bloc-modify-post container">
@@ -98,13 +82,13 @@
                                                     <i class="far fa-times-circle fa-2x modaleBloc__card__title__close"></i>
                                                 </div>
                                                 <div class="col-6 save-btn">
-                                                    <button v-on:click="updatePost(post.id)" class="btn">Enregistrer</button>
+                                                    <button :id="post.id" v-on:click="updatePost(post.id)" class="btn">Enregistrer</button>
                                                 </div>
                                             </div>
                                             <div class="row modify-post">
                                                 <div class="col-6 media">
-                                                    <div v-if="newAttachment != ''" class="img-post">
-                                                        <img :src="newAttachment" alt="image du message">
+                                                    <div v-if="newAttachment" class="img-post">
+                                                        <img id="image" :src="newAttachment" alt="image du message">
                                                     </div>
                                                 </div>
                                                 <div class="col-6 content-post-to-modify">
@@ -120,8 +104,9 @@
                                                         <textarea v-model="newContent" class="text-to-modify"></textarea>
                                                     </div>
                                                     <div class="row media-tools">
-                                                        <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i></button> 
-                                                        <!-- <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil"> -->
+                                                        <button for="input" @click="uploadNewFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i></button> 
+                                                        <input style="display:none" type="file" ref="uploadNewFile" name="image" @change="newFileSelected"  accept="image/*" id="input" aria-label="Modifier l'image du message">
+
     
                                                         <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> </button>
                                                     </div>
@@ -166,14 +151,17 @@ import Likes from '../components/Likes.vue'
                 attachment: '',
                 file: '',
                 likes: 0,
-                commentsBloc: false,
                 bloc: false,
+
+                messageId : '',
+                img: '',
 
                 newTitle: '',
                 newContent: '',
                 imgUserPostId: '',
                 usernamePostId: '',
                 newAttachment: '',
+
             }
         },
         created(){
@@ -188,13 +176,27 @@ import Likes from '../components/Likes.vue'
         },
         methods: {
             onFileSelected(event){
-                
                 this.attachment = event.target.files[0]
                 console.log(this.attachment);
             },
+
             uploadFile(){
-                this.$refs.uploadFile.click()
+                this.attachement = this.$refs.uploadFile.click()
             },
+
+            uploadNewFile(){
+                this.newAttachment = this.$refs.uploadFile.click()
+            },
+
+            newFileSelected(){
+                this.newAttachment = event.target.files[0]
+                console.log(this.newAttachment);
+
+                // const previewImg = URL.createObjectURL(this.newAttachment)
+                // console.log(previewImg);
+            },
+
+
             // Permet de créer un post
             createPost() {
                 const formData = new FormData()
@@ -208,8 +210,8 @@ import Likes from '../components/Likes.vue'
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                 })
-                .then((res) => {
-                    console.log(res.data);
+                .then((response) => {
+                    console.log(response.data);
                     window.location.reload()
                 })
                 .catch(error => {
@@ -236,10 +238,6 @@ import Likes from '../components/Likes.vue'
                     this.notyf.error(msgerror.error)
                 })
             },
-            // Permet d'afficher les commentaires d'un post
-             displayComments() {
-                this.commentsBloc = !this.commentsBloc
-            },
             // Permet d'afficher la date de publication au bon format
             dateFormat(date){
                 if (date) {
@@ -264,7 +262,9 @@ import Likes from '../components/Likes.vue'
                 })                
             },
             displayModificationBloc(id){
-                const messageId = id;  
+                const messageId = id; 
+                this.messageId = messageId
+                console.log(this.messageId); 
                 console.log(messageId);
                 this.bloc = !this.bloc
                 axios.get('http://localhost:3000/api/users/messages/' + messageId, {
@@ -280,30 +280,28 @@ import Likes from '../components/Likes.vue'
                         this.usernamePostId = messageById.User.username
                         this.newTitle = messageById.title
                         this.newContent = messageById.content
-                        this.newImg = messageById.attachment
+                        this.newAttachment = messageById.attachment
+                        
                 })
                 .catch(error => {
                     const msgerror = error.response.data
                     this.notyf.error(msgerror.error)
                 })
             },
-            closeModificationBloc(id){
-                const messageId = id;
-                console.log(messageId);
+            closeModificationBloc(){
                 this.bloc = !this.bloc
             },
-            updatePost(id){
-                const messageId = id;
 
-                const message = {
-                    title: this.newTitle,
-                    content: this.newContent,
-                    attchement: this.newAttachment
-                }      
-                console.log(message);
-                axios.put('http://localhost:3000/api/users/messages/' + messageId, message,{
+            updatePost(){
+                const messageId = this.messageId
+                console.log(messageId);
+                const formData = new FormData();
+                formData.append('image' , this.newAttachment)
+                formData.append('title', this.newTitle)
+                formData.append('content', this.newContent)
+                axios.put('http://localhost:3000/api/users/messages/' + messageId, formData,{
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'multipart/form-data',
                         'Authorization': 'Bearer ' + localStorage.getItem('token')
                     }
                 })
@@ -518,6 +516,9 @@ import Likes from '../components/Likes.vue'
                         width: 50%;
                         justify-content: flex-end;
                         border-top: 1px solid lightgray;
+                        #newUploadFile{
+                            display: none;
+                        }
                     }
             }
             
