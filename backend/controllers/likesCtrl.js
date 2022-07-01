@@ -8,7 +8,7 @@ const asyncLib = require('async');
 const DISLIKED = 0;
 const LIKED = 1;
 
-//Permet d'obtenir et d'afficher le nombre de likes ou dislikes
+//Permet d'obtenir et d'afficher le nombre de likes ou dislikes sur chaque article
 exports.getLikes = (req, res, next) => {
     //Permet de vérifier le token
     headerAuth = req.headers['authorization'].split('Bearer ')[1]
@@ -18,6 +18,7 @@ exports.getLikes = (req, res, next) => {
     
     messageId = parseInt(req.params.messageId);
 
+    // Recherche de likes dans la base de données pour un message précis (messageId)
     models.Like.findOne({
              where: {
                 messageId: messageId,
@@ -58,7 +59,9 @@ exports.like = (req, res, next) => {
     if(messageId < 0){
         return res.status(404).json({"error": "invalid params"})
     }
-    
+    // Dans un premier temps, on cherche le message que l'utilisateur souhaite liker
+    // Si le message est bien trouvé, on vérifie que l'utilisateur n'a pas déjà liké ce message
+    // si l'utilisateur n'a pas encore liké le message, la valeur initial des likes est incrémenté de 1
     asyncLib.waterfall([
         function(done){
             models.Message.findOne({
@@ -147,6 +150,11 @@ exports.dislike = (req, res) => {
         return res.status(404).json({"error": "invalid params"})
     }
     
+    // Dans un premier temps, on cherche le message que l'utilisateur souhaite disliker
+    // On vérifie également que l'utilisateur se trouve bien dans la base de données 
+    // Et si le l'identifiant du message et celui de l'utilisateur se trouve dans la table LIKES
+    // si une ligne de cette table correspond au messageId et au userId, 
+    // le message peut alors être dislike. Sa valeur initiale décrémenter de 1
     asyncLib.waterfall([
         function(done){
             models.Message.findOne({

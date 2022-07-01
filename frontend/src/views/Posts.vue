@@ -20,10 +20,10 @@
                         </div>
                     </div>
                     <div class="row post-tools">
-                        <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn"><i class="bi bi-image">Image</i></button> 
+                        <button for="file-input"  @click="uploadFile" class="col-md-3 col-3 btn tool-btn"><i class="bi bi-image"></i>Image</button> 
                         <input type="file" ref="uploadFile" name="image" @change="onFileSelected"  accept="image/*" id="file-input" aria-label="Modifier ma photo de profil">
     
-                        <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube">Vidéo</i></button>
+                        <button class="col-md-3 col-3 btn tool-btn" type="button" name="vidéo"><i class="bi bi-youtube"></i>Vidéo</button>
                         <button type="submit" @click="createPost" class="col-md-6 col-6 btn btn-sm btn-submit">Publier</button>
                     </div>
                 </div>
@@ -34,6 +34,11 @@
                         <iframe src="https://calendar.google.com/calendar/embed?height=300&wkst=1&bgcolor=%23ffffff&ctz=Europe%2FParis&title=Groupomania%20Agenda&showCalendars=1&showTabs=1&showPrint=0&showTz=0&src=azBzcHRwbWFlNGd2a29zaXE5MGtmN2VvbWtAZ3JvdXAuY2FsZW5kYXIuZ29vZ2xlLmNvbQ&src=ZnIuZnJlbmNoI2hvbGlkYXlAZ3JvdXAudi5jYWxlbmRhci5nb29nbGUuY29t&color=%23D50000&color=%237986CB" style="border:solid 1px #777" width="300" height="300" frameborder="0" scrolling="no"></iframe>                
                     </div>
                 </aside>
+
+
+                <div class="">
+                        <p class="text-muted">Aucun post n'a été publié !</p>
+                </div>
 
                 <!-- Bloc affichant les posts -->
                 <div class="displayPost" v-for="post in posts" :key="post.id">
@@ -87,8 +92,11 @@
                                             </div>
                                             <div class="row modify-post">
                                                 <div class="col-6 media">
-                                                    <div v-if="newAttachment" class="img-post">
-                                                        <img id="image" :src="newAttachment" alt="image du message">
+                                                    <div v-if="attachment" v-show="showImgPost" class="img-post">
+                                                        <img id="image" :src="attachment" alt="image du message">
+                                                    </div>
+                                                    <div v-if="newAttachment" v-show="showNewImgPost" class="img-post">
+                                                            <img id="image" :src="newAttachment" alt="image du message">
                                                     </div>
                                                 </div>
                                                 <div class="col-6 content-post-to-modify">
@@ -105,8 +113,6 @@
                                                     </div>
                                                     <div class="row media-tools">
                                                         <button for="input" @click="uploadNewFile" class="col-md-3 col-3 btn"><i class="bi bi-image"></i></button> 
-                                                        <input style="display:none" type="file" ref="uploadNewFile" name="image" @change="newFileSelected"  accept="image/*" id="input" aria-label="Modifier l'image du message">
-
     
                                                         <button class="col-md-3 col-3 btn" type="button" name="vidéo"><i class="bi bi-youtube"></i> </button>
                                                     </div>
@@ -153,8 +159,10 @@ import Likes from '../components/Likes.vue'
                 likes: 0,
                 bloc: false,
 
+                showImgPost: true, 
+                showNewImgPost: false,
+
                 messageId : '',
-                img: '',
 
                 newTitle: '',
                 newContent: '',
@@ -178,24 +186,21 @@ import Likes from '../components/Likes.vue'
             onFileSelected(event){
                 this.attachment = event.target.files[0]
                 console.log(this.attachment);
-            },
 
+                if(event.target.files.length > 0){
+                    this.newAttachment = URL.createObjectURL(event.target.files[0]);
+                    this.showImgPost = !this.showImgPost;
+                    this.showNewImgPost = !this.showNewImgPost
+                }
+
+            },
+            // Permettent de télécharger les fichiers sur le serveur
             uploadFile(){
-                this.attachement = this.$refs.uploadFile.click()
+                this.attachment = this.$refs.uploadFile.click()
             },
-
             uploadNewFile(){
                 this.newAttachment = this.$refs.uploadFile.click()
             },
-
-            newFileSelected(){
-                this.newAttachment = event.target.files[0]
-                console.log(this.newAttachment);
-
-                // const previewImg = URL.createObjectURL(this.newAttachment)
-                // console.log(previewImg);
-            },
-
 
             // Permet de créer un post
             createPost() {
@@ -231,6 +236,7 @@ import Likes from '../components/Likes.vue'
                 })
                 .then(response => {
                     this.posts = response.data;
+                    console.log({"posts": response.data});
                     console.log(this.posts)
                 })
                 .catch(error => {
@@ -280,7 +286,7 @@ import Likes from '../components/Likes.vue'
                         this.usernamePostId = messageById.User.username
                         this.newTitle = messageById.title
                         this.newContent = messageById.content
-                        this.newAttachment = messageById.attachment
+                        this.attachment = messageById.attachment
                         
                 })
                 .catch(error => {
@@ -296,7 +302,7 @@ import Likes from '../components/Likes.vue'
                 const messageId = this.messageId
                 console.log(messageId);
                 const formData = new FormData();
-                formData.append('image' , this.newAttachment)
+                formData.append('image' , this.attachment)
                 formData.append('title', this.newTitle)
                 formData.append('content', this.newContent)
                 axios.put('http://localhost:3000/api/users/messages/' + messageId, formData,{
@@ -353,6 +359,10 @@ import Likes from '../components/Likes.vue'
                 height: 65px;
                 background-position: center;
                 margin: 0 20px;
+                i{
+                    font-size: 50px;
+                    color: white;
+                }
                 @media (max-width: 775px) {
                     display: none;
                 }
@@ -380,10 +390,13 @@ import Likes from '../components/Likes.vue'
             margin: 5px auto;
             
         }
-        .btn{
+        .tool-btn{
             color: #FFD7D7;
             font-weight: bold;
             font-size: 13px;
+            i{
+                margin: 7px;
+            }
             svg{
             margin-right: 5px;
             }

@@ -24,6 +24,8 @@ exports.createPost = (req, res, next) => {
         return res.status(400).json({"error": "Votre message doit contenir entre 3 et 250 caractères."})
     }
 
+    // Permet de trouver l'utilisateur créateur du post dans la BD, 
+    // et d'adresser son identifiant au nouveau message posté 
     models.User.findOne({
         attributes: ['id', 'username'],
         where : { id: userId }
@@ -58,8 +60,9 @@ exports.listPost = (req, res, next) => {
     offset = parseInt(req.query.offset) // limit et offset permettent de récupérer les messages par segmentation afin d'avoir les messages un à un avec un systeme de page
     order = req.query.order // permet de sortir la liste des messages via un order particulier
 
+    // Permet de trouver tous les messages présents dans la BD
     // cette méthode prend en tant que premier params tous les attributs de notre requête en s'assurant que l'utilisateur entre des données corrects
-    // ne peuvent pas être NULL, et autres restrictions
+    // ne peuvent pas être NULL, et autres restrictions...
     models.Message.findAll({
         order: [(order != null) ? order.split(':') : ['createdAt', 'DESC']],
         attributes: (fields !== '*' && fields != null) ? fields.split(',') : null,
@@ -93,7 +96,6 @@ exports.modifyPost = (req,res) => {
     console.log({"verify": userId});
  
      const messageId = req.params.messageId
-     console.log(messageId);
      const title = req.body.title
      const content = req.body.content
      const newAttachment = req.file ?
@@ -102,7 +104,7 @@ exports.modifyPost = (req,res) => {
       attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
      } : { ...req.body };
      
-     
+     // Permet de trouver un message précis afin de pouvoir le modifier
      models.Message.findOne({
              attributes: ['id', 'title', 'content', 'attachment'],
              where : { id: messageId, 
@@ -152,6 +154,9 @@ exports.deletePost = (req,res) => {
         })
         .then(function(messageFound){
             // Si l'utilisateur est bien le créateur du message OU si l'utilisateur est admin ET si un message est trouvé en fonction de son ID
+            // On récupère tous les likes correspondant au message trouvé afin de les supprimer
+            // S'ils sont bien supprimés ou s'il n'en existait aucun, la suppression du message est également validée.
+            // Une fois toutes ces données supprimées, l'utilisateur est également upprimé avec succès de la BD.
             if((userId === messageFound.userId || userFound.isAdmin === true) && messageFound){
                     models.Like.findAll({
                     where:{

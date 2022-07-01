@@ -28,7 +28,7 @@ exports.signup = (req, res, next) => {
    // Vérification de la validité du mot de passe
     if (!isPasswordValid(req.body.password)) {
         return res.status(400).json({
-            message: validationMessages(req.body.password)
+            error: validationMessages(req.body.password)
         });
     }
      // Vérification de la syntaxe de l'email grâce à Regex
@@ -44,6 +44,7 @@ exports.signup = (req, res, next) => {
     .then(function(userFound){
         //Si l'utilisateur n'est pas trouvé dans la BD
         if(!userFound) {
+            //L'email récupèré dans le corps de la requête est cryptée avant d'être stocké
             const emailEncrypted = encrypt(req.body.email)
             //un nouvel utilisateur est créé et son mot de passe est salé avant d'être stocké
             bcrypt.genSalt(5, function(err, salt){
@@ -92,11 +93,11 @@ exports.login = (req, res) => {
     })
     .then(function(userFound){
         //Si l'utilisateur est trouvé
-        console.log(userFound);
         if(userFound){
             //bcrypt compare le mdp entré en clair avec le mot de passe salé de la BD
             bcrypt.compare(password, userFound.password, function(err, results){
                 //Si le mdp est valide, l'utilisateur accède à ses données et obtient un token
+                // Son email doit être décrypter pour être affiché sur le frontend
                 if(results){
                 return res.status(200).json({
                     results : results,
@@ -137,7 +138,8 @@ exports.profile = (req, res) => {
         return res.status(400).json({"error" : "wrong token"})
     }
 
-    //Permet de trouver un utilisateur dans la BD
+    // Récupére les données de l'utilisateur grâce à son identifiant pour les afficher sur son profil
+    // L'email doit être décryptée pour être affichée.
     models.User.findOne({
     attributes: ['id', 'email', 'username', 'lastname', 'firstname', 'bio', 'imageProfile', 'isAdmin'],
     where: { id : userId }
@@ -174,31 +176,38 @@ exports.updateProfile = (req, res) => {
     const lastname = req.body.lastname
     const firstname = req.body.firstname
     const bio = req.body.bio
-    const email = req.body.email
-    const userPic = req.file ?
+
+    // Permet d'enregistrer les photos de profil sur le serveur
+    const user = req.file ?
     {
      ...req.body,
     imageProfile: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+    } : { ...req.body.imageProfile };
 
+    // Permet de crypter l'email si celui-ci est modifié sur le frontend avant de le stocker à nouveau dans la BD.
+    const encryptUser = encrypt(req.body.email)
+
+    // On cherche l'utilisateur correspondant dans la base données,
+    // S'il existe, ses données peuvent être modifiées.
     models.User.findOne({
             attributes: ['id', 'username', 'lastname', 'firstname', 'bio', 'email', 'imageProfile'],
             where : { id: userId}
         })
         .then((userFound) => {
             if(userFound){
-                userFound.update(userPic, {
+                userFound.update({
                     username: (username ? username : userFound.username),
                     lastname: (lastname ? lastname : userFound.lastname),
                     firstname: (firstname ? firstname : userFound.firstname),
                     bio : (bio ? bio : userFound.bio),
-                    email: ( email  ? email : userFound.email),
-                    imageProfile: (userPic ? userPic : userFound.imageProfile)
+                    email: ( encryptUser  ? encryptUser : userFound.email),
+                    imageProfile: (user.imageProfile ? user.imageProfile : userFound.imageProfile)
                 })
             } else {
                 return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
              }
             return res.status(201).json({userFound})
+            
         })
         .catch(function(err){
             return res.status(500).json({"error" : "Impossible de vérifier"})
@@ -214,6 +223,10 @@ exports.deleteAccount = (req,res) => {
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
+
+    // Permet de récupérer toutes les interractions de l'utilisateur afin de les supprimer
+    // Si les interractions sont trouvées, elles sont supprimées avant que le profil ne soit supprimé
+    // Si aucune interraction n'existe, le profil est directement supprimé
     models.Like.findAll({
         where: { userId : userId}
     })
@@ -237,7 +250,15 @@ exports.deleteAccount = (req,res) => {
                 return res.status(400).json({"error" : "Impossible de supprimer les likes de l'utilisateur"})
             })
         } else {
-
+            models.User.destroy({
+                where: { id : userId}
+            })
+            .then((userDeleted) => {
+                return res.status(200).json({"message" : "Votre compte a bien été supprimé !"})
+            })
+            .catch((error) => {
+                return res.status(400).json({"error" : "Un problème est survenu lors de la suppréssion du compte"})
+            })
         }
     })
     .catch((error)=>{

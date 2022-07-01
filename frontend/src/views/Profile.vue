@@ -40,10 +40,13 @@
                             <form @submit.prevent="onSubmit">
 
                                 <div class="form-input row">
-                                    <div class="bloc-upload-img">
+                                    <div v-show='showInput' class="bloc-upload-img">
                                             <label for="form-file-input" class="form-img-profile label-img-profile"><i class="fa-solid fa-file-arrow-up"></i><p>Changer ma photo de profil</p></label>
                                             <input type="file" ref="uploadFormFile" name="image" @change="onFormFileSelected"  accept="image/*" id="form-file-input" aria-label="Modifier ma photo de profil">
                                     </div>
+                                    <div v-show='imgPreview' class="bloc-upload-img">
+                                        <img id="image" :src="newImageProfile" alt="image du message">
+                                    </div>       
                                 </div>
 
                                 <div class="form-input row">
@@ -131,6 +134,9 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                 email: "",
                 imageProfile: null,
                 bloc: false,
+                showInput: true,
+                imgPreview: false,
+                newImageProfile: "",
             }
         },
         created() {
@@ -168,23 +174,28 @@ import DeleteAccount from '../components/DeleteAccount.vue'
             //Affiche le bloc permettant à l'utilisateur de modifier ses informations
             displayModify(){
                 this.revele = !this.revele
+                this.username = this.user.username
+                this.lastname = this.user.lastname
+                this.firstname = this.user.firstname
+                this.bio = this.user.bio
+                this.email = this.user.email
             },
             onFileSelected(event) {
                 this.$refs.uploadFile.click()
 				this.imageProfile = event.target.files[0]
-                if(this.imageProfile === null){
-                    console.log("cant null");
-                } else {
-                    console.log(this.imageProfile);
+
+                if(this.imageProfile){
                     this.uploadImgProfile();
-                    
                 }
 			},
             //Permet d'ajouter ou modifier l'image du profil directement sur la fiche profil
             uploadImgProfile(){
                 const userId = localStorage.getItem('userId')
+                this.email = localStorage.getItem('email')
                 const imgData = new FormData();
+                console.log(this.email);
                 imgData.append("image", this.imageProfile)
+                imgData.append("email", this.email)
                     axios.put('http://localhost:3000/api/users/profile/' + userId, imgData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -204,6 +215,13 @@ import DeleteAccount from '../components/DeleteAccount.vue'
             },
             onFormFileSelected(event) {
 				this.imageProfile = event.target.files[0]
+                console.log(this.imageProfile);
+                if(event.target.files.length > 0){
+                    this.newImageProfile = URL.createObjectURL(event.target.files[0]);
+                    this.showInput = !this.showInput;
+                    this.imgPreview = !this.imgPreview
+                }
+                
 			},
             uploadFormFile(){
                 this.refs.uploadFormFile.click();
@@ -279,19 +297,15 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                 top: 25px;
             }
             .img-profile{
-                width: 200px;
-                height: 200px;
+                width: 50%;
+                height: 173px;
                 display: inline-flex;
                 border: 2px solid white;
                 border-radius: 50%;
                 overflow: hidden;
                 .image{
-                    width: 300px;
-                    height: 200px;
-                    border-radius: 100%;
-                    position: relative;
-                    right: 21%;
-                    top: -2%;
+                    width: 100%;
+                    height: 169px;
                 }
                 input{
                     display: none;
@@ -377,6 +391,7 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                 .bloc-upload-img{
                     display: grid;
                     margin-bottom: 35px;
+                    overflow: hidden;
                     .label-img-profile{
                         text-align: center;
                         font-size: 40px;
@@ -387,6 +402,10 @@ import DeleteAccount from '../components/DeleteAccount.vue'
                     }
                     #form-file-input{
                         display: none;
+                    }
+                    #image{
+                        width: 50%;
+                        justify-self: center;
                     }
                 }
                 .btn-img-profile{
@@ -428,7 +447,6 @@ import DeleteAccount from '../components/DeleteAccount.vue'
         padding: 35px;
         .name{
             font-size: 35px;
-            font-weight: bold;
         }
     }
 }
