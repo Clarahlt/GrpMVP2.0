@@ -24,7 +24,7 @@ Backend :
 
 ▹ Le frontend de l'application doit fonctionner sur localhost avec le port par défaut 3000.
 
-▹ Copiez le fichier .env.example en remplaçant la valeur par défaut pour crypter l'email de l'utilisateur;
+▹ A partir du dossier backend, ajouter un fichier .env et configurer la clé CryptoJS "CRYPTO_KEY". (ATTENTION: la chaîne de caractères de la clé ne doit pas dépasser 16 caractères)
 
 Base de données :
 
