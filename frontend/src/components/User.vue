@@ -51,7 +51,7 @@ export default {
         },
   methods: {
     login() {
-        //Permet de se connecter, de récupérer les informations de l'utilisateur
+        //Permet de se connecter, de récupérer les informations de l'utilisateur qui sont stocker dans le localStorage
         //Et de basculer sur la page affichant les posts
         axios.post('http://localhost:3000/api/users/login', {
                     email: this.email,

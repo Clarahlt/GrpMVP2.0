@@ -183,25 +183,6 @@ import Likes from '../components/Likes.vue'
             });
         },
         methods: {
-            onFileSelected(event){
-                this.attachment = event.target.files[0]
-                console.log(this.attachment);
-
-                if(event.target.files.length > 0){
-                    this.newAttachment = URL.createObjectURL(event.target.files[0]);
-                    this.showImgPost = !this.showImgPost;
-                    this.showNewImgPost = !this.showNewImgPost
-                }
-
-            },
-            // Permettent de télécharger les fichiers sur le serveur
-            uploadFile(){
-                this.attachment = this.$refs.uploadFile.click()
-            },
-            uploadNewFile(){
-                this.newAttachment = this.$refs.uploadFile.click()
-            },
-
             // Permet de créer un post
             createPost() {
                 const formData = new FormData()
@@ -226,7 +207,29 @@ import Likes from '../components/Likes.vue'
 
             },
 
-            // Permet d'afficher tous les messages
+            // Permet de récupérer les informations d'un fichier image
+            onFileSelected(event){
+                this.attachment = event.target.files[0]
+                console.log(this.attachment);
+
+                // Cette méthode permet de créer une URL provisoire d'une image pour la prévisualiser 
+                if(event.target.files.length > 0){
+                    this.newAttachment = URL.createObjectURL(event.target.files[0]);
+                    this.showImgPost = !this.showImgPost;
+                    this.showNewImgPost = !this.showNewImgPost
+                }
+
+            },
+
+            // Permettent de télécharger les fichiers images sur le serveur
+            uploadFile(){
+                this.attachment = this.$refs.uploadFile.click()
+            },
+            uploadNewFile(){
+                this.newAttachment = this.$refs.uploadFile.click()
+            },
+
+            // Permet d'afficher tous les messages sur la page Posts
             displayPost() {
                 axios.get('http://localhost:3000/api/users/messages', {
                     headers: {
@@ -244,29 +247,15 @@ import Likes from '../components/Likes.vue'
                     this.notyf.error(msgerror.error)
                 })
             },
+
             // Permet d'afficher la date de publication au bon format
             dateFormat(date){
                 if (date) {
                     return moment(String(date)).format('DD/MM/YYYY')
                 }
             },
-            //Permet de supprimer un post
-            deletePost(id){
-                const messageId = id;              
-                axios.delete('http://localhost:3000/api/users/messages/' + messageId, {
-                    headers: {
-                        'Content-Type' : 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token')
-                    }
-                })
-                .then(() => {
-                    this.displayPost();
-                })
-                .catch(error => {
-                    const msgerror = error.response.data
-                    this.notyf.error(msgerror.error)
-                })                
-            },
+
+            //Permet d'afficher le bloc de modification des informations du profil
             displayModificationBloc(id){
                 const messageId = id; 
                 this.messageId = messageId
@@ -294,10 +283,13 @@ import Likes from '../components/Likes.vue'
                     this.notyf.error(msgerror.error)
                 })
             },
+
+            // Permet de fermer le bloc de modification du profil
             closeModificationBloc(){
                 this.bloc = !this.bloc
             },
 
+            // Permet de modifier les informations du profil
             updatePost(){
                 const messageId = this.messageId
                 console.log(messageId);
@@ -322,9 +314,26 @@ import Likes from '../components/Likes.vue'
                 .catch((err)=> {
                     console.log(err);
                 })
-            }
+            },
+
+            //Permet de supprimer un post
+            deletePost(id){
+                const messageId = id;              
+                axios.delete('http://localhost:3000/api/users/messages/' + messageId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then(() => {
+                    this.displayPost();
+                })
+                .catch(error => {
+                    const msgerror = error.response.data
+                    this.notyf.error(msgerror.error)
+                })                
+            },
         },
-        
     }
 </script>
 

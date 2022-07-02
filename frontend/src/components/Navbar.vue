@@ -1,4 +1,5 @@
 <template>  
+    <!-- Barre de navigation / Menu -->
     <div id="Navbar" class="container-fluid-lg">
         <nav class="navbar navbar-expand-lg navbar-light nav">
             
@@ -22,6 +23,7 @@
                         <router-link to='/profile' class="display-profile"><i class="bi bi-person"></i><p>Mon profil</p></router-link>
                     </li>
                     
+                    <!-- Permet de se déconnecter -->
                     <li class="item">
                         <Logout class="logout"/>
                     </li>
