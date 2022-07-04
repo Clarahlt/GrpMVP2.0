@@ -2,6 +2,7 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const session = require('cookie-session')
 
 //Permet d'importer les routes
 const userRoutes = require('./routes/user');
@@ -15,6 +16,22 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     next();
   });
+
+
+const expiryDate = new Date(Date.now() + 300000);
+  app.use(session({
+    name: 'session',
+    secret: process.env.SESSSION_KEY,
+    resave : false,
+    saveUninitialized: true,
+    cookie: {
+      path: '/',
+      secure: true,
+      httpOnly: true,
+      domain: 'http://http://localhost:8080/',
+      expires: expiryDate,
+    }
+  }));
 
 //Transforme le corps de la requête en objet JS
 app.use(bodyParser.urlencoded({ extended: true }));

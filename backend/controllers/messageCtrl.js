@@ -60,6 +60,8 @@ exports.listPost = (req, res, next) => {
     offset = parseInt(req.query.offset) // limit et offset permettent de récupérer les messages par segmentation afin d'avoir les messages un à un avec un systeme de page
     order = req.query.order // permet de sortir la liste des messages via un order particulier
 
+    session = req.session
+    console.log(session);
     // Permet de trouver tous les messages présents dans la BD
     // cette méthode prend en tant que premier params tous les attributs de notre requête en s'assurant que l'utilisateur entre des données corrects
     // ne peuvent pas être NULL, et autres restrictions...
@@ -105,33 +107,27 @@ exports.modifyPost = (req,res) => {
      } : { ...req.body };
 
 
-    models.User.findOne({
-        attributes: ['id', 'isAdmin'],
-        where: { id : userId}
+    // Permet de trouver un message précis afin de pouvoir le modifier
+    models.Message.findOne({
+        attributes: ['id', 'title', 'content', 'attachment'],
+        where : { id: messageId, 
+        userId : userId}
     })
-    .then((userFound) => {
-        models.Message.findOne({
-            attributes: ['id', 'title', 'content', 'attachment'],
-            where: {
-                id: messageId,
-            }
-        })
-        .then((messageFound) => {
-            if((userId === messageFound.userId || userFound.isAdmin === true) && messageFound){
-                messageFound.update(newAttachment, {
-                    title: (title ? title : messageFound.title),
-                    content: (content ? content : messageFound.content),
-                    attachment: (newAttachment ? newAttachment : messageFound.attachment)
-                })
-                return res.status(200).json(messageFound)
-            } else {
-                return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
-            }   
-        })
-        .catch(function(err){
-            console.log(err);
-            return res.status(500).json({"error" : "Impossible de vérifier"})
-        })
+    .then((messageFound) => {
+         if(messageFound){
+            messageFound.update(newAttachment, {
+                title: (title ? title : messageFound.title),
+                content: (content ? content : messageFound.content),
+                attachment: (newAttachment ? newAttachment : messageFound.attachment)
+            })
+            return res.status(200).json(messageFound)
+        } else {
+            return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
+        }
+    })
+    .catch(function(err){
+        console.log(err);
+        return res.status(500).json({"error" : "Impossible de vérifier"})
     })
 },
 

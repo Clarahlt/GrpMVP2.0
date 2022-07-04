@@ -20,6 +20,7 @@ exports.signup = (req, res, next) => {
     firstname = req.body.firstname
     password = req.body.email
 
+
     //Permet de vérifier que tous les champs sont complétés
     if(email == "" || username == "" || lastname == "" || firstname == "" || password == "") {
         return res.status(400).json({ "error" : "Tous les champs doivent être remplis !"})
@@ -78,6 +79,7 @@ exports.signup = (req, res, next) => {
 
 //Permet de se connecter à l'application 
 exports.login = (req, res) => {
+
     email = req.body.email
     password = req.body.password
     console.log(encrypt(email));

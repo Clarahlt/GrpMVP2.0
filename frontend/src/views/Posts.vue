@@ -58,8 +58,8 @@
                                         <div v-if="post.userId == this.userId || this.isAdmin == 'true'" class="dropdown">
                                             <button type="button" class="btn" data-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
                                             <div class="dropdown-menu">
-                                                <a  @click="displayModificationBloc(post.id)" class="dropdown-item" href="#">Modifier</a>
-                                                <div class="dropdown-divider"></div>
+                                                <a v-if="post.userId == this.userId" @click="displayModificationBloc(post.id)" class="dropdown-item" href="#">Modifier</a>
+                                                <div v-if="post.userId == this.userId" class="dropdown-divider"></div>
                                                 <a @click="deletePost(post.id)" class="dropdown-item" href="#">Supprimer</a> 
                                             </div>
                                         </div>
