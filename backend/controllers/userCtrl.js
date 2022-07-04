@@ -39,7 +39,7 @@ exports.signup = (req, res, next) => {
     //Permet de vérifier que l'utilisateur existe dans la base de données
     models.User.findOne({
         attributes: ['email'],
-        where: { email : email}
+        where: { email : encrypt(email)}
     })
     .then(function(userFound){
         //Si l'utilisateur n'est pas trouvé dans la BD
@@ -68,7 +68,7 @@ exports.signup = (req, res, next) => {
                 })
             })
         } else {
-            return res.status(409).json({"message": "l'utilisateur existe déjà"})
+            return res.status(409).json({"error": "l'utilisateur existe déjà"})
         }
     })
     .catch(function(erreur){

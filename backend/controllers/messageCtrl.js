@@ -103,31 +103,37 @@ exports.modifyPost = (req,res) => {
       ...req.body,
       attachment: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
      } : { ...req.body };
-     
-     // Permet de trouver un message précis afin de pouvoir le modifier
-     models.Message.findOne({
-             attributes: ['id', 'title', 'content', 'attachment'],
-             where : { id: messageId, 
-             userId : userId}
-         })
-         .then((messageFound) => {
-              if(messageFound){
-                 messageFound.update(newAttachment, {
-                     title: (title ? title : messageFound.title),
-                     content: (content ? content : messageFound.content),
-                     attachment: (newAttachment ? newAttachment : messageFound.attachment)
-                 })
-                 return res.status(200).json(messageFound)
-             } else {
-                 return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
-             }
-         })
-         .catch(function(err){
-             console.log(err);
-             return res.status(500).json({"error" : "Impossible de vérifier"})
-         })
-         
- },
+
+
+    models.User.findOne({
+        attributes: ['id', 'isAdmin'],
+        where: { id : userId}
+    })
+    .then((userFound) => {
+        models.Message.findOne({
+            attributes: ['id', 'title', 'content', 'attachment'],
+            where: {
+                id: messageId,
+            }
+        })
+        .then((messageFound) => {
+            if((userId === messageFound.userId || userFound.isAdmin === true) && messageFound){
+                messageFound.update(newAttachment, {
+                    title: (title ? title : messageFound.title),
+                    content: (content ? content : messageFound.content),
+                    attachment: (newAttachment ? newAttachment : messageFound.attachment)
+                })
+                return res.status(200).json(messageFound)
+            } else {
+                return res.status(500).json({"error" : "La modification n'a pas été prise en compte"})
+            }   
+        })
+        .catch(function(err){
+            console.log(err);
+            return res.status(500).json({"error" : "Impossible de vérifier"})
+        })
+    })
+},
 
 //Permet de supprimer un message
 exports.deletePost = (req,res) => {
