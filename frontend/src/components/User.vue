@@ -72,8 +72,8 @@ export default {
                 })
                 .catch(error => {
                     const msgerror = error.response.data
-                    this.notyf.error(msgerror.message)
-                    console.log(msgerror);
+                    this.notyf.error(msgerror.error)
+                    console.log(msgerror.error);
                 })
             }
   }

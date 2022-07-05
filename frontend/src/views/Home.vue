@@ -18,6 +18,10 @@
 <script>
 //Imports
 import User from "@/components/User.vue";
+import axios from 'axios';
+
+import { Notyf } from 'notyf'
+import 'notyf/notyf.min.css'
 
 export default {
   name: "home",
@@ -30,11 +34,38 @@ export default {
       disappear: true,
     };
   },
+  created(){
+    this.AlreadyLogin();
+    this.notyf = new Notyf({
+                duration: 4000,
+                position: {
+                    x: 'center',
+                    y: 'bottom'
+                }
+            });
+  },
   methods: {
     //Permet d'afficher le bloc de connexion
     connectForm() {
       (this.revele = true), (this.disappear = false);
     },
+    AlreadyLogin(){
+      const userId = localStorage.getItem('userId')
+      console.log(userId);
+      const token = localStorage.getItem('token')
+      axios.get('http://localhost:3000/api/users/profile/' + userId, {
+                    headers: {
+                        'Content-Type' : 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                })
+                .then((res) => {
+                  if(res.data.user.token === token){
+                    this.notyf.success('Ravie de vous revoir si vite')
+                    this.$router.push('/posts')
+                  }
+                })
+    }
   },
 };
 </script>

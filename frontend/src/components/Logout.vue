@@ -8,10 +8,12 @@ export default {
     methods:{
         // Permet de se déconnecter
         logout() {
+            localStorage.removeItem('firstname');
+            localStorage.removeItem('username');
+            localStorage.removeItem('email');
+            localStorage.removeItem('imageProfile');
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
-            localStorage.removeItem('isAdmin');
-            localStorage.removeItem('imageProfile');
 
             this.$router.push('http://localhost:8080/')
         }

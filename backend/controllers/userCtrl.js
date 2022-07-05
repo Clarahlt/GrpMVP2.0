@@ -79,10 +79,8 @@ exports.signup = (req, res, next) => {
 
 //Permet de se connecter à l'application 
 exports.login = (req, res) => {
-
     email = req.body.email
     password = req.body.password
-    console.log(encrypt(email));
 
     //Permet de vérifier que tous les champs sont complétés
     if(email == "" || password == ""){
@@ -136,6 +134,9 @@ exports.profile = (req, res) => {
     userId = auth.verifyToken(headerAuth)
     console.log({"verify": userId});
 
+
+
+
     if(userId < 0 ){
         return res.status(400).json({"error" : "wrong token"})
     }
@@ -155,8 +156,10 @@ exports.profile = (req, res) => {
             bio: user.bio,
             email: decrypt(user.email),
             isAdmin: user.isAdmin,
-            imageProfile: user.imageProfile
+            imageProfile: user.imageProfile,
+            token: headerAuth
         }
+        console.log(userDetails);
             return res.status(200).json({user : userDetails})
         } else {
             res.status(404).json({ "error" : "Utilisateur non autorisé"});

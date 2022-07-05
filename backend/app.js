@@ -24,11 +24,10 @@ const expiryDate = new Date(Date.now() + 300000);
     secret: process.env.SESSSION_KEY,
     resave : false,
     saveUninitialized: true,
-    cookie: {
-      path: '/',
+    cookie: { 
       secure: true,
       httpOnly: true,
-      domain: 'http://http://localhost:8080/',
+      domain: 'http://http://localhost:8080',
       expires: expiryDate,
     }
   }));

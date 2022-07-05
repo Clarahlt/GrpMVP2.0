@@ -10,7 +10,7 @@ module.exports = {
           { userId: userData.id,
             isAdmin: userData.isAdmin,},
           'RANDOM_TOKEN_SECRET', 
-          { expiresIn : '24h'})
+          { expiresIn : '12h'})
       },
       parseAuthorization: function(authorization) {
         return (authorization != null) ? authorization.replace('Bearer', '') : null;

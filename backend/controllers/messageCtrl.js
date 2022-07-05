@@ -59,9 +59,7 @@ exports.listPost = (req, res, next) => {
     limit = parseInt(req.query.limit) 
     offset = parseInt(req.query.offset) // limit et offset permettent de récupérer les messages par segmentation afin d'avoir les messages un à un avec un systeme de page
     order = req.query.order // permet de sortir la liste des messages via un order particulier
-
-    session = req.session
-    console.log(session);
+    
     // Permet de trouver tous les messages présents dans la BD
     // cette méthode prend en tant que premier params tous les attributs de notre requête en s'assurant que l'utilisateur entre des données corrects
     // ne peuvent pas être NULL, et autres restrictions...
